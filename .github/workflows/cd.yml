@@ -1,0 +1,83 @@
+# ============================================================
+# CD — Déploiement Continu sur Railway
+# Staging : auto sur push develop
+# Production : auto sur push main (avec approval)
+# ============================================================
+name: CD
+
+on:
+  push:
+    branches: [main, develop]
+
+env:
+  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+jobs:
+
+  # ──────────────────────────────────────────────
+  # 1. STAGING — Deploy automatique sur develop
+  # ──────────────────────────────────────────────
+  deploy-staging:
+    name: 🚀 Deploy Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy sur Railway (staging)
+        run: railway up --service ${{ vars.RAILWAY_STAGING_SERVICE }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Résumé du déploiement
+        run: |
+          echo "## 🚀 Staging déployé" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branche:** develop" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL:** ${{ vars.STAGING_URL }}" >> $GITHUB_STEP_SUMMARY
+
+  # ──────────────────────────────────────────────
+  # 2. PRODUCTION — Deploy sur main avec approval
+  # ──────────────────────────────────────────────
+  deploy-production:
+    name: 🏭 Deploy Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy sur Railway (production)
+        run: railway up --service ${{ vars.RAILWAY_PROD_SERVICE }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Exécuter les migrations en production
+        run: railway run --service ${{ vars.RAILWAY_PROD_SERVICE }} python manage.py migrate --no-input
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Collectstatic
+        run: railway run --service ${{ vars.RAILWAY_PROD_SERVICE }} python manage.py collectstatic --no-input
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Résumé du déploiement
+        run: |
+          echo "## 🏭 Production déployée" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branche:** main" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL:** ${{ vars.PRODUCTION_URL }}" >> $GITHUB_STEP_SUMMARY

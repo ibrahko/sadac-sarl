@@ -59,40 +59,6 @@ class DashboardView(StaffRequiredMixin, TemplateView):
 
 
 # ===================================================
-# CATEGORIES
-# ===================================================
-class CategoryCreateView(StaffRequiredMixin, CreateView):
-    model = Category
-    template_name = "backoffice/products/category_form.html"
-    fields = ["name", "slug"]
-    success_url = reverse_lazy("backoffice:category_list")
-
-    def form_valid(self, form):
-        messages.success(self.request, "Catégorie créée avec succès.")
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["title"] = "Ajouter une catégorie"
-        return ctx
-
-
-class CategoryUpdateView(StaffRequiredMixin, UpdateView):
-    model = Category
-    template_name = "backoffice/products/category_form.html"
-    fields = ["name", "slug"]
-    success_url = reverse_lazy("backoffice:category_list")
-
-    def form_valid(self, form):
-        messages.success(self.request, "Catégorie mise à jour.")
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["title"] = "Modifier la catégorie"
-        return ctx
-
-# ===================================================
 # PRODUITS
 # ===================================================
 class ProductListView(StaffRequiredMixin, ListView):

@@ -1,0 +1,172 @@
+# ============================================================
+# CI — Intégration Continue
+# Déclenché sur chaque push et pull request
+# ============================================================
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PYTHON_VERSION: "3.12"
+  DJANGO_SETTINGS_MODULE: sadac.settings.dev
+
+jobs:
+
+  # ──────────────────────────────────────────────
+  # 1. LINT — Qualité du code
+  # ──────────────────────────────────────────────
+  lint:
+    name: 🔍 Lint (flake8 + isort)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-lint-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-lint-
+
+      - name: Installer les outils de lint
+        run: pip install flake8 isort
+
+      - name: Flake8
+        run: flake8 .
+
+      - name: isort (vérification import)
+        run: isort --check-only --diff .
+
+  # ──────────────────────────────────────────────
+  # 2. TEST — Tests unitaires + couverture
+  # ──────────────────────────────────────────────
+  test:
+    name: 🧪 Tests (pytest + coverage)
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-test-${{ hashFiles('requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-test-
+
+      - name: Installer les dépendances
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-django pytest-cov flake8 isort
+
+      - name: Créer le .env pour les tests
+        run: |
+          cat > .env << 'EOF'
+          SECRET_KEY=ci-test-secret-key-not-for-production
+          DEBUG=True
+          ALLOWED_HOSTS=*
+          EMAIL_HOST=smtp.test.com
+          EMAIL_PORT=587
+          EMAIL_HOST_USER=test@test.com
+          EMAIL_HOST_PASSWORD=test
+          DEFAULT_FROM_EMAIL=test@test.com
+          SADAC_EMAIL=test@test.com
+          DB_NAME=test_db
+          DB_USER=postgres
+          DB_PASSWORD=postgres
+          DB_HOST=localhost
+          DB_PORT=5432
+          EOF
+
+      - name: Vérification Django (check)
+        run: python manage.py check --deploy 2>&1 || true
+
+      - name: Migrations
+        run: python manage.py migrate --run-syncdb
+
+      - name: Tests avec couverture
+        run: |
+          pytest --cov=apps \
+                 --cov-report=term-missing \
+                 --cov-report=html:htmlcov \
+                 --cov-fail-under=50 \
+                 -v
+
+      - name: Upload rapport couverture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/
+          retention-days: 7
+
+  # ──────────────────────────────────────────────
+  # 3. SECURITY — Vérification des dépendances
+  # ──────────────────────────────────────────────
+  security:
+    name: 🔒 Security check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Vérifier les vulnérabilités
+        run: |
+          pip install pip-audit
+          pip install -r requirements.txt
+          pip-audit || true
+
+  # ──────────────────────────────────────────────
+  # 4. DOCKER — Build de l'image
+  # ──────────────────────────────────────────────
+  docker-build:
+    name: 🐳 Build Docker
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image Docker
+        run: docker build -t sadac-sarl:${{ github.sha }} .
+
+      - name: Vérifier que l'image démarre
+        run: |
+          docker run --rm -d \
+            --name sadac-test \
+            -e SECRET_KEY=test-key \
+            -e DEBUG=True \
+            -e ALLOWED_HOSTS=* \
+            -e EMAIL_HOST=smtp.test.com \
+            -e EMAIL_PORT=587 \
+            -e EMAIL_HOST_USER=test@test.com \
+            -e EMAIL_HOST_PASSWORD=test \
+            -e DEFAULT_FROM_EMAIL=test@test.com \
+            -e SADAC_EMAIL=test@test.com \
+            -p 8000:8000 \
+            sadac-sarl:${{ github.sha }}
+          sleep 5
+          docker logs sadac-test
+          docker stop sadac-test
