@@ -81,25 +81,25 @@ DEBUG=False                          # True pour staging
 ALLOWED_HOSTS=<ton-domaine>.railway.app
 DJANGO_SETTINGS_MODULE=sadac.settings.prod
 
-DB_NAME=<fourni par Railway>
-DB_USER=<fourni par Railway>
-DB_PASSWORD=<fourni par Railway>
-DB_HOST=<fourni par Railway>
+DB_NAME=sadac_db
+DB_USER=sadacuser
+DB_PASSWORD=Admin123@!
+DB_HOST=localhost
 DB_PORT=5432
 
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_HOST_USER=<ton email>
-EMAIL_HOST_PASSWORD=<app password>
-DEFAULT_FROM_EMAIL=<ton email>
-SADAC_EMAIL=<email sadac>
+EMAIL_HOST_USER=info@sadac-sarl.com
+EMAIL_HOST_PASSWORD=S@adac123
+DEFAULT_FROM_EMAIL=contact@sadac-sarl.com
+SADAC_EMAIL=info@sadac-sarl.com
 ```
 
 ### Obtenir le token Railway :
 
 1. Va sur [railway.app](https://railway.app) → Account Settings → Tokens
 2. Crée un token → copie-le
-3. Colle-le dans les secrets GitHub sous `RAILWAY_TOKEN`
+3. Colle-le dans les secrets GitHub sous `RAILWAY_TOKEN` 
 
 ## Étape 4 — Workflow Git quotidien
 
@@ -148,3 +148,4 @@ make security      # Vérifier les vulnérabilités
 | `develop` | Intégration | → Railway Staging (auto) |
 | `feature/*` | Développement | → CI uniquement (pas de deploy) |
 | `fix/*` | Corrections | → CI uniquement (pas de deploy) |
+top
