@@ -47,7 +47,9 @@ RUN SECRET_KEY=build-only \
     DEFAULT_FROM_EMAIL=x SADAC_EMAIL=x \
     DB_NAME=x DB_USER=x DB_PASSWORD=x \
     DJANGO_SETTINGS_MODULE=sadac.settings.prod \
-    python manage.py collectstatic --no-input 2>/dev/null || true
+    python manage.py collectstatic --no-input && \
+    ls -la /app/staticfiles/ && \
+    ls -la /app/staticfiles/img/ || echo "STATIC FILES MISSING"
 
 # Créer les dossiers nécessaires
 RUN mkdir -p /app/media /app/staticfiles /app/logs && \
