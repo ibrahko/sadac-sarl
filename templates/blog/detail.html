@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <span class="badge bg-warning text-dark mb-3">
+      <i class="bi bi-newspaper me-1"></i>Actualité
+    </span>
+    <h1 class="fw-bold display-6">{{ post.title }}</h1>
+    <div class="d-flex align-items-center justify-content-center
+                gap-3 mt-3 flex-wrap">
+      <span class="text-white opacity-75 small">
+        <i class="bi bi-calendar3 me-1"></i>
+        {{ post.published_at|date:"d M Y"|default:"—" }}
+      </span>
+      {% if post.author %}
+        <span class="text-white opacity-75 small">
+          <i class="bi bi-person me-1"></i>
+          {{ post.author.get_full_name|default:post.author.username }}
+        </span>
+      {% endif %}
+    </div>
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        >
+          <a href="{% url 'blog:list' %}" class="text-warning">Actualités</a>
+        </li>
+        >
+          {{ post.title|truncatewords:5 }}
+        </li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== CONTENU ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+
+      <!-- ===== ARTICLE ===== -->
+      <div class="col-lg-8">
+
+        {% if post.image %}
+          <img src="{{ post.image.url }}"
+               alt="{{ post.title }}"
+               class="img-fluid rounded-3 shadow mb-4 w-100"
+               style="height:400px; object-fit:cover;"/>
+        {% endif %}
+
+        <!-- Contenu -->
+        <div class="article-content text-muted lh-lg fs-6">
+          {{ post.content|linebreaks }}
+        </div>
+
+        <!-- Partage -->
+        <div class="mt-5 pt-4 border-top">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-share text-success me-2"></i>
+            Partager cet article
+          </h6>
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+               target="_blank"
+               class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-facebook me-1"></i>Facebook
+            </a>
+            <a href="https://wa.me/?text={{ post.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}"
+               target="_blank"
+               class="btn btn-sm btn-success">
+              <i class="bi bi-whatsapp me-1"></i>WhatsApp
+            </a>
+            <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ request.build_absolute_uri|urlencode }}"
+               target="_blank"
+               class="btn btn-sm btn-outline-dark">
+              <i class="bi bi-twitter-x me-1"></i>Twitter / X
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation entre articles -->
+        <div class="mt-5 pt-4 border-top">
+          <div class="row g-3">
+            {% if previous_post %}
+            <div class="col-md-6">
+              <a href="{% url 'blog:detail' previous_post.slug %}"
+                 class="card border-0 shadow-sm p-3 text-decoration-none
+                        d-flex flex-row align-items-center gap-3 h-100
+                        hover-green">
+                <i class="bi bi-arrow-left text-success fs-4 flex-shrink-0"></i>
+                <div>
+                  <p class="text-muted small mb-0">Article précédent</p>
+                  <p class="fw-semibold text-dark mb-0 small">
+                    {{ previous_post.title|truncatewords:8 }}
+                  </p>
+                </div>
+              </a>
+            </div>
+            {% endif %}
+            {% if next_post %}
+            <div class="col-md-6 ms-auto">
+              <a href="{% url 'blog:detail' next_post.slug %}"
+                 class="card border-0 shadow-sm p-3 text-decoration-none
+                        d-flex flex-row align-items-center gap-3 h-100
+                        text-end hover-green justify-content-end">
+                <div>
+                  <p class="text-muted small mb-0">Article suivant</p>
+                  <p class="fw-semibold text-dark mb-0 small">
+                    {{ next_post.title|truncatewords:8 }}
+                  </p>
+                </div>
+                <i class="bi bi-arrow-right text-success fs-4 flex-shrink-0"></i>
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== SIDEBAR ===== -->
+      <div class="col-lg-4">
+
+        <!-- Newsletter -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-top: 4px solid var(--sadac-orange) !important;">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-2">
+              <i class="bi bi-bell text-success me-2"></i>
+              Newsletter
+            </h5>
+            <p class="text-muted small mb-3">
+              Recevez nos prochains articles directement
+              dans votre boîte mail.
+            </p>
+            <form method="post" action="{% url 'newsletter:subscribe' %}">
+              {% csrf_token %}
+              <div class="mb-2">
+                <input type="text" name="name"
+                       class="form-control form-control-sm mb-2"
+                       placeholder="Votre nom (optionnel)"/>
+                <input type="email" name="email"
+                       class="form-control form-control-sm"
+                       placeholder="Votre email"
+                       required/>
+              </div>
+              <button type="submit"
+                      class="btn btn-sadac btn-sm w-100 mt-2">
+                <i class="bi bi-send me-1"></i>S'inscrire
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Derniers articles -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">
+              <i class="bi bi-clock-history text-success me-2"></i>
+              Articles récents
+            </h5>
+            <ul class="list-unstyled mb-0">
+              {% for recent in recent_posts %}
+                
+                  {% if not forloop.last %}border-bottom{% endif %}">
+                  <a href="{% url 'blog:detail' recent.slug %}"
+                     class="text-decoration-none text-dark">
+                    <div class="d-flex gap-3 align-items-start">
+                      {% if recent.image %}
+                        <img src="{{ recent.image.url }}"
+                             alt="{{ recent.title }}"
+                             class="rounded flex-shrink-0"
+                             style="width:55px;height:55px;
+                                    object-fit:cover;"/>
+                      {% else %}
+                        <div class="rounded flex-shrink-0 bg-success
+                                    bg-opacity-10 d-flex align-items-center
+                                    justify-content-center"
+                             style="width:55px;height:55px;">
+                          <i class="bi bi-newspaper text-success"></i>
+                        </div>
+                      {% endif %}
+                      <div>
+                        <p class="fw-semibold small mb-0 lh-sm">
+                          {{ recent.title|truncatewords:8 }}
+                        </p>
+                        <p class="text-muted small mb-0 mt-1">
+                          <i class="bi bi-calendar3 me-1"></i>
+                          {{ recent.published_at|date:"d M Y"|default:"—" }}
+                        </p>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              {% empty %}
+                >
+                  Aucun autre article disponible.
+                </li>
+              {% endfor %}
+            </ul>
+            <a href="{% url 'blog:list' %}"
+               class="btn btn-outline-success btn-sm w-100 mt-3">
+              Voir tous les articles
+            </a>
+          </div>
+        </div>
+
+        <!-- Contact rapide -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-2">
+              <i class="bi bi-headset text-success me-2"></i>
+              Une question ?
+            </h5>
+            <p class="text-muted small mb-3">
+              Notre équipe est disponible pour répondre
+              à toutes vos questions.
+            </p>
+            <a href="{% url 'core:contact' %}"
+               class="btn btn-sadac btn-sm w-100 mb-2">
+              <i class="bi bi-envelope me-1"></i>Nous écrire
+            </a>
+            {% if site_settings and site_settings.whatsapp %}
+              <a href="https://wa.me/{{ site_settings.whatsapp }}"
+                 target="_blank"
+                 class="btn btn-success btn-sm w-100">
+                <i class="bi bi-whatsapp me-1"></i>WhatsApp
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Vous avez un projet agricole ?</h2>
+    <p class="lead opacity-75 mb-4">
+      Contactez-nous dès aujourd'hui, notre équipe est à votre disposition.
+    </p>
+    <a href="{% url 'core:contact' %}"
+       class="btn btn-warning btn-lg px-5 fw-bold">
+      <i class="bi bi-envelope me-2"></i>Nous contacter
+    </a>
+  </div>
+</section>
+
+{% endblock %}

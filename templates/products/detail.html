@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ product.title }} – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    {% if product.category %}
+      <span class="badge bg-warning text-dark mb-3">
+        {{ product.category.name }}
+      </span>
+    {% endif %}
+    <h1 class="fw-bold display-6">{{ product.title }}</h1>
+    <nav aria-label="breadcrumb"
+         class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">
+            Accueil
+          </a>
+        </li>
+        >
+          <a href="{% url 'products:list' %}" class="text-warning">
+            Produits
+          </a>
+        </li>
+        >
+          {{ product.title }}
+        </li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== DÉTAIL PRODUIT ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+
+      <!-- Image -->
+      <div class="col-lg-5">
+        {% if product.image %}
+          <img src="{{ product.image.url }}"
+               alt="{{ product.title }}"
+               class="img-fluid rounded-3 shadow-lg w-100"
+               style="max-height:450px; object-fit:cover;"/>
+        {% else %}
+          <div class="rounded-3 bg-success bg-opacity-10
+                      d-flex align-items-center
+                      justify-content-center"
+               style="height:350px;">
+            <i class="bi bi-box-seam text-success"
+               style="font-size:6rem;"></i>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Infos produit -->
+      <div class="col-lg-7">
+        {% if product.category %}
+          <span class="badge bg-success mb-2">
+            {{ product.category.name }}
+          </span>
+        {% endif %}
+
+        <h2 class="fw-bold mb-3">{{ product.title }}</h2>
+
+        {% if product.price_info %}
+          <div class="d-flex align-items-center gap-2 mb-4">
+            <i class="bi bi-tag fs-5"
+               style="color:var(--sadac-orange);"></i>
+            <span class="fw-bold fs-5"
+                  style="color:var(--sadac-orange);">
+              {{ product.price_info }}
+            </span>
+          </div>
+        {% endif %}
+
+        <div class="divider-orange mb-4"></div>
+
+        <p class="text-muted lh-lg mb-4">
+          {{ product.description }}
+        </p>
+
+        <!-- Badges infos -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <span class="badge bg-success bg-opacity-10
+                       text-success px-3 py-2">
+            <i class="bi bi-check-circle me-1"></i>
+            Produit disponible
+          </span>
+          <span class="badge bg-light text-muted px-3 py-2
+                       border">
+            <i class="bi bi-geo-alt me-1"></i>
+            Bamako, Mali
+          </span>
+          <span class="badge bg-light text-muted px-3 py-2
+                       border">
+            <i class="bi bi-truck me-1"></i>
+            Livraison sur demande
+          </span>
+        </div>
+
+        <!-- Boutons action -->
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="{% url 'orders:order_product' product.slug %}"
+             class="btn btn-sadac btn-lg px-5">
+            <i class="bi bi-cart-plus me-2"></i>
+            Commander / Demander un devis
+          </a>
+          {% if site_settings and site_settings.whatsapp %}
+            <a href="https://wa.me/{{ site_settings.whatsapp }}?text=Bonjour, je suis intéressé par le produit : {{ product.title }}"
+               target="_blank"
+               class="btn btn-success btn-lg px-4">
+              <i class="bi bi-whatsapp me-2"></i>
+              WhatsApp
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Infos contact rapide -->
+        <div class="mt-4 p-3 bg-light rounded-3">
+          <p class="text-muted small mb-2 fw-semibold">
+            <i class="bi bi-headset text-success me-2"></i>
+            Besoin d'informations supplémentaires ?
+          </p>
+          <div class="d-flex gap-3 flex-wrap">
+            {% if site_settings and site_settings.phone1 %}
+              <a href="tel:{{ site_settings.phone1 }}"
+                 class="text-muted small text-decoration-none">
+                <i class="bi bi-telephone text-success me-1"></i>
+                {{ site_settings.phone1 }}
+              </a>
+            {% endif %}
+            {% if site_settings and site_settings.email %}
+              <a href="mailto:{{ site_settings.email }}"
+                 class="text-muted small text-decoration-none">
+                <i class="bi bi-envelope text-success me-1"></i>
+                {{ site_settings.email }}
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== AUTRES PRODUITS ===== -->
+{% if related_products %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h3 class="fw-bold">Autres produits</h3>
+      <div class="divider-orange mx-auto mt-2"></div>
+    </div>
+    <div class="row g-4">
+      {% for p in related_products %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-product h-100 shadow-sm border-0">
+          {% if p.image %}
+            <img src="{{ p.image.url }}"
+                 alt="{{ p.title }}"
+                 class="card-img-top product-img"/>
+          {% else %}
+            <div class="product-img-placeholder d-flex
+                        align-items-center justify-content-center
+                        bg-light">
+              <i class="bi bi-box-seam fs-1 text-muted"></i>
+            </div>
+          {% endif %}
+          <div class="card-body">
+            {% if p.category %}
+              <span class="badge bg-success mb-2">
+                {{ p.category.name }}
+              </span>
+            {% endif %}
+            <h5 class="fw-bold">{{ p.title }}</h5>
+            <p class="text-muted small">
+              {{ p.description|truncatewords:15 }}
+            </p>
+            {% if p.price_info %}
+              <p class="fw-bold mb-0"
+                 style="color:var(--sadac-orange);">
+                {{ p.price_info }}
+              </p>
+            {% endif %}
+          </div>
+          <div class="card-footer bg-transparent border-0
+                      pb-3 d-flex gap-2">
+            <a href="{% url 'products:detail' p.slug %}"
+               class="btn btn-sadac btn-sm flex-grow-1">
+              Voir le produit
+            </a>
+            <a href="{% url 'orders:order_product' p.slug %}"
+               class="btn btn-accent btn-sm flex-grow-1">
+              <i class="bi bi-cart-plus me-1"></i>Commander
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">
+      Intéressé par ce produit ?
+    </h2>
+    <p class="lead opacity-75 mb-4">
+      Contactez-nous pour plus d'informations ou
+      pour passer une commande.
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{% url 'orders:order_product' product.slug %}"
+         class="btn btn-warning btn-lg px-5 fw-bold">
+        <i class="bi bi-cart-plus me-2"></i>Commander
+      </a>
+      <a href="{% url 'core:contact' %}"
+         class="btn btn-outline-light btn-lg px-5">
+        <i class="bi bi-envelope me-2"></i>Nous contacter
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

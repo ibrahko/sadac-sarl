@@ -1,0 +1,104 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Partenaires – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  >Partenaires</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-handshake me-2"></i>Partenaires</h4>
+    <p class="text-muted small mb-0">
+      {{ partners|length }} partenaire(s)
+    </p>
+  </div>
+  <a href="{% url 'backoffice:partner_create' %}"
+     class="btn btn-bo-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Ajouter un partenaire
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if partners %}
+    <div class="table-responsive">
+      <table class="table bo-table mb-0">
+        <thead>
+          <tr>
+            <th>Logo</th>
+            <th>Nom</th>
+            <th>Site web</th>
+            <th>Ordre</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for partner in partners %}
+          <tr>
+            <td>
+              {% if partner.logo %}
+                <img src="{{ partner.logo.url }}"
+                     alt="{{ partner.name }}"
+                     style="height:45px;
+                            max-width:100px;
+                            object-fit:contain;"/>
+              {% else %}
+                <div class="bg-light rounded d-flex align-items-center
+                            justify-content-center"
+                     style="width:60px;height:45px;">
+                  <i class="bi bi-image text-muted"></i>
+                </div>
+              {% endif %}
+            </td>
+            <td class="fw-semibold small">{{ partner.name }}</td>
+            <td class="small">
+              {% if partner.website %}
+                <a href="{{ partner.website }}"
+                   target="_blank"
+                   class="text-success text-decoration-none">
+                  <i class="bi bi-link-45deg me-1"></i>
+                  {{ partner.website|truncatechars:30 }}
+                </a>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <span class="badge bg-secondary">
+                {{ partner.order }}
+              </span>
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'backoffice:partner_update' partner.pk %}"
+                   class="btn btn-sm btn-outline-success"
+                   title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'backoffice:partner_delete' partner.pk %}"
+                   class="btn btn-sm btn-outline-danger"
+                   title="Supprimer">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bo-empty">
+      <i class="bi bi-handshake"></i>
+      <p>Aucun partenaire ajouté pour le moment.</p>
+      <a href="{% url 'backoffice:partner_create' %}"
+         class="btn btn-bo-primary btn-sm">
+        Ajouter le premier partenaire
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

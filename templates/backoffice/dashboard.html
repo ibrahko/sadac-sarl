@@ -1,0 +1,499 @@
+{% extends "backoffice/base_bo.html" %}
+{% load static %}
+
+{% block title %}Dashboard – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  >Dashboard</li>
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== EN-TÊTE ===== -->
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-speedometer2 me-2"></i>Tableau de bord</h4>
+    <p class="text-muted small mb-0">
+      Bienvenue, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong> –
+      {% now "l d F Y" %}
+    </p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'backoffice:product_create' %}"
+       class="btn btn-bo-primary btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>Nouveau produit
+    </a>
+    <a href="{% url 'backoffice:post_create' %}"
+       class="btn btn-bo-warning btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>Nouvel article
+    </a>
+    <a href="{% url 'backoffice:event_create' %}"
+       class="btn btn-outline-success btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>Nouvel événement
+    </a>
+  </div>
+</div>
+
+<!-- ===== STATS CARDS ===== -->
+<div class="row g-4 mb-4">
+
+  <!-- Produits -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card stat-card shadow-sm h-100 p-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <p class="text-muted small mb-1 fw-semibold text-uppercase">
+            Produits
+          </p>
+          <h2 class="fw-bold mb-0">{{ total_products }}</h2>
+          <p class="text-muted small mb-0 mt-1">
+            <a href="{% url 'backoffice:product_list' %}"
+               class="text-success text-decoration-none">
+              Gérer les produits →
+            </a>
+          </p>
+        </div>
+        <div class="stat-icon"
+             style="background:rgba(46,125,50,0.12);">
+          <i class="bi bi-box-seam text-success"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card stat-card shadow-sm h-100 p-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <p class="text-muted small mb-1 fw-semibold text-uppercase">
+            Services
+          </p>
+          <h2 class="fw-bold mb-0">{{ total_services }}</h2>
+          <p class="text-muted small mb-0 mt-1">
+            <a href="{% url 'backoffice:service_list' %}"
+               class="text-success text-decoration-none">
+              Gérer les services →
+            </a>
+          </p>
+        </div>
+        <div class="stat-icon"
+             style="background:rgba(46,125,50,0.12);">
+          <i class="bi bi-grid text-success"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Événements -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card stat-card shadow-sm h-100 p-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <p class="text-muted small mb-1 fw-semibold text-uppercase">
+            Événements
+          </p>
+          <h2 class="fw-bold mb-0">{{ total_events }}</h2>
+          <p class="text-muted small mb-0 mt-1">
+            <a href="{% url 'backoffice:event_list' %}"
+               class="text-success text-decoration-none">
+              Gérer les événements →
+            </a>
+          </p>
+        </div>
+        <div class="stat-icon"
+             style="background:rgba(245,127,23,0.12);">
+          <i class="bi bi-calendar-event"
+             style="color:var(--bo-accent);"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Articles -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card stat-card shadow-sm h-100 p-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <p class="text-muted small mb-1 fw-semibold text-uppercase">
+            Articles
+          </p>
+          <h2 class="fw-bold mb-0">{{ total_posts }}</h2>
+          <p class="text-muted small mb-0 mt-1">
+            <a href="{% url 'backoffice:post_list' %}"
+               class="text-success text-decoration-none">
+              Gérer les articles →
+            </a>
+          </p>
+        </div>
+        <div class="stat-icon"
+             style="background:rgba(59,130,246,0.12);">
+          <i class="bi bi-newspaper text-primary"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commandes -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card stat-card shadow-sm h-100 p-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <p class="text-muted small mb-1 fw-semibold text-uppercase">
+            Commandes
+          </p>
+          <h2 class="fw-bold mb-0">{{ total_orders }}</h2>
+          {% if new_orders %}
+            <p class="mb-0 mt-1">
+              <span class="badge bg-danger">
+                {{ new_orders }} nouvelle(s)
+              </span>
+            </p>
+          {% endif %}
+        </div>
+        <div class="stat-icon"
+             style="background:rgba(239,68,68,0.12);">
+          <i class="bi bi-cart-check text-danger"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abonnés -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card stat-card shadow-sm h-100 p-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <p class="text-muted small mb-1 fw-semibold text-uppercase">
+            Abonnés newsletter
+          </p>
+          <h2 class="fw-bold mb-0">{{ total_subscribers }}</h2>
+          <p class="text-muted small mb-0 mt-1">
+            <a href="{% url 'backoffice:subscriber_list' %}"
+               class="text-success text-decoration-none">
+              Voir les abonnés →
+            </a>
+          </p>
+        </div>
+        <div class="stat-icon"
+             style="background:rgba(16,185,129,0.12);">
+          <i class="bi bi-people" style="color:#10B981;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages non lus -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card stat-card shadow-sm h-100 p-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <p class="text-muted small mb-1 fw-semibold text-uppercase">
+            Messages non lus
+          </p>
+          <h2 class="fw-bold mb-0">{{ total_messages }}</h2>
+          <p class="text-muted small mb-0 mt-1">
+            <a href="{% url 'backoffice:message_list' %}"
+               class="text-success text-decoration-none">
+              Voir les messages →
+            </a>
+          </p>
+        </div>
+        <div class="stat-icon"
+             style="background:rgba(245,127,23,0.12);">
+          <i class="bi bi-chat-dots"
+             style="color:var(--bo-accent);"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== CONTENU PRINCIPAL ===== -->
+<div class="row g-4">
+
+  <!-- ===== DERNIÈRES COMMANDES ===== -->
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-cart-check text-success me-2"></i>
+            Dernières commandes
+          </h6>
+          <a href="{% url 'backoffice:order_list' %}"
+             class="btn btn-outline-success btn-sm">
+            Voir tout
+          </a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_orders %}
+          <div class="table-responsive">
+            <table class="table bo-table mb-0">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Produit</th>
+                  <th>Statut</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                  <td>
+                    <div class="fw-semibold small">{{ order.full_name }}</div>
+                    <div class="text-muted small">{{ order.phone }}</div>
+                  </td>
+                  <td class="small">
+                    {{ order.product|default:"—" }}
+                    <span class="text-muted">(x{{ order.quantity }})</span>
+                  </td>
+                  <td>
+                    {% if order.status == 'new' %}
+                      <span class="badge badge-new">Nouveau</span>
+                    {% elif order.status == 'processing' %}
+                      <span class="badge badge-processing">En cours</span>
+                    {% elif order.status == 'delivered' %}
+                      <span class="badge badge-delivered">Livré</span>
+                    {% else %}
+                      <span class="badge badge-cancelled">Annulé</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted small">
+                    {{ order.created_at|date:"d M Y" }}
+                  </td>
+                  <td>
+                    <a href="{% url 'backoffice:order_detail' order.pk %}"
+                       class="btn btn-sm btn-outline-success">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="bo-empty">
+            <i class="bi bi-cart-x"></i>
+            <p>Aucune commande pour le moment.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COLONNE DROITE ===== -->
+  <div class="col-lg-5 d-flex flex-column gap-4">
+
+    <!-- Événements à venir -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-calendar-event text-success me-2"></i>
+            Événements à venir
+          </h6>
+          <a href="{% url 'backoffice:event_create' %}"
+             class="btn btn-outline-success btn-sm">
+            <i class="bi bi-plus-lg"></i>
+          </a>
+        </div>
+      </div>
+      <div class="card-body px-4">
+        {% if upcoming_events %}
+          {% for event in upcoming_events %}
+          <div class="d-flex align-items-start gap-3
+                      {% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+            <div class="text-center rounded p-2 flex-shrink-0"
+                 style="background:rgba(46,125,50,0.1);
+                        min-width:50px;">
+              <div class="fw-bold text-success small">
+                {{ event.start_date|date:"d" }}
+              </div>
+              <div class="text-muted" style="font-size:0.65rem;">
+                {{ event.start_date|date:"M" }}
+              </div>
+            </div>
+            <div class="flex-grow-1">
+              <p class="fw-semibold small mb-0">{{ event.title }}</p>
+              <p class="text-muted small mb-0">
+                <i class="bi bi-geo-alt me-1"></i>{{ event.location }}
+              </p>
+            </div>
+            <a href="{% url 'backoffice:event_update' event.pk %}"
+               class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-pencil"></i>
+            </a>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="bo-empty py-4">
+            <i class="bi bi-calendar-x" style="font-size:2rem;"></i>
+            <p class="small">Aucun événement à venir.</p>
+            <a href="{% url 'backoffice:event_create' %}"
+               class="btn btn-bo-primary btn-sm">
+              Créer un événement
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Derniers messages -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-chat-dots text-success me-2"></i>
+            Derniers messages
+          </h6>
+          <a href="{% url 'backoffice:message_list' %}"
+          class="btn btn-outline-success btn-sm">
+         Voir tout
+       </a>
+     </div>
+   </div>
+   <div class="card-body px-4 pb-4">
+     {% if recent_messages %}
+       {% for msg in recent_messages %}
+       <div class="d-flex align-items-start gap-3
+                   {% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+         <div class="rounded-circle bg-success bg-opacity-10
+                     d-flex align-items-center justify-content-center
+                     flex-shrink-0 text-success fw-bold"
+              style="width:40px;height:40px;">
+           {{ msg.name|slice:":1"|upper }}
+         </div>
+         <div class="flex-grow-1 overflow-hidden">
+           <div class="d-flex align-items-center
+                       justify-content-between gap-2">
+             <p class="fw-semibold small mb-0 text-truncate">
+               {{ msg.name }}
+             </p>
+             {% if not msg.is_read %}
+               <span class="badge bg-danger flex-shrink-0">Nouveau</span>
+             {% endif %}
+           </div>
+           <p class="text-muted small mb-0 text-truncate">
+             {{ msg.subject }}
+           </p>
+           <p class="text-muted small mb-0"
+              style="font-size:0.75rem;">
+             <i class="bi bi-clock me-1"></i>
+             {{ msg.created_at|date:"d M Y H:i" }}
+           </p>
+         </div>
+         <a href="{% url 'backoffice:message_detail' msg.pk %}"
+            class="btn btn-sm btn-outline-success flex-shrink-0">
+           <i class="bi bi-eye"></i>
+         </a>
+       </div>
+       {% endfor %}
+     {% else %}
+       <div class="bo-empty py-4">
+         <i class="bi bi-chat-square-x" style="font-size:2rem;"></i>
+         <p class="small">Aucun message reçu.</p>
+       </div>
+     {% endif %}
+   </div>
+ </div>
+
+</div>
+</div>
+
+<!-- ===== ACCÈS RAPIDES ===== -->
+<div class="row g-3 mt-2">
+<div class="col-12">
+ <div class="card border-0 shadow-sm p-4">
+   <h6 class="fw-bold mb-3">
+     <i class="bi bi-lightning-charge text-warning me-2"></i>
+     Accès rapides
+   </h6>
+   <div class="row g-3">
+
+     <div class="col-lg-2 col-md-4 col-6">
+       <a href="{% url 'backoffice:product_create' %}"
+          class="d-flex flex-column align-items-center gap-2
+                 p-3 rounded-3 text-decoration-none
+                 text-center bo-quick-link">
+         <i class="bi bi-box-seam fs-3 text-success"></i>
+         <span class="small fw-semibold text-dark">Ajouter produit</span>
+       </a>
+     </div>
+
+     <div class="col-lg-2 col-md-4 col-6">
+       <a href="{% url 'backoffice:event_create' %}"
+          class="d-flex flex-column align-items-center gap-2
+                 p-3 rounded-3 text-decoration-none
+                 text-center bo-quick-link">
+         <i class="bi bi-calendar-plus fs-3 text-success"></i>
+         <span class="small fw-semibold text-dark">Créer événement</span>
+       </a>
+     </div>
+
+     <div class="col-lg-2 col-md-4 col-6">
+       <a href="{% url 'backoffice:post_create' %}"
+          class="d-flex flex-column align-items-center gap-2
+                 p-3 rounded-3 text-decoration-none
+                 text-center bo-quick-link">
+         <i class="bi bi-pencil-square fs-3 text-primary"></i>
+         <span class="small fw-semibold text-dark">Écrire article</span>
+       </a>
+     </div>
+
+     <div class="col-lg-2 col-md-4 col-6">
+       <a href="{% url 'backoffice:gallery_create' %}"
+          class="d-flex flex-column align-items-center gap-2
+                 p-3 rounded-3 text-decoration-none
+                 text-center bo-quick-link">
+         <i class="bi bi-images fs-3 text-warning"></i>
+         <span class="small fw-semibold text-dark">Créer galerie</span>
+       </a>
+     </div>
+
+     <div class="col-lg-2 col-md-4 col-6">
+       <a href="{% url 'backoffice:send_newsletter' %}"
+          class="d-flex flex-column align-items-center gap-2
+                 p-3 rounded-3 text-decoration-none
+                 text-center bo-quick-link">
+         <i class="bi bi-envelope-paper fs-3"
+            style="color:var(--bo-accent);"></i>
+         <span class="small fw-semibold text-dark">Newsletter</span>
+       </a>
+     </div>
+
+     <div class="col-lg-2 col-md-4 col-6">
+       <a href="{% url 'backoffice:settings' %}"
+          class="d-flex flex-column align-items-center gap-2
+                 p-3 rounded-3 text-decoration-none
+                 text-center bo-quick-link">
+         <i class="bi bi-gear fs-3 text-secondary"></i>
+         <span class="small fw-semibold text-dark">Paramètres</span>
+       </a>
+     </div>
+
+   </div>
+ </div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bo-quick-link {
+ background: #f8f9fa;
+ transition: background 0.2s, transform 0.2s;
+}
+.bo-quick-link:hover {
+ background: rgba(46,125,50,0.08);
+ transform: translateY(-3px);
+}
+</style>
+{% endblock %}
+

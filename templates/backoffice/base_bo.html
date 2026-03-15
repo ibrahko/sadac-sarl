@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Backoffice – SADAC{% endblock %}</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/backoffice.css' %}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="bo-body">
+
+<div class="d-flex" id="wrapper">
+
+  <!-- ===== SIDEBAR ===== -->
+  <nav id="sidebar" class="bo-sidebar d-flex flex-column">
+
+    <!-- Logo -->
+    <div class="bo-logo d-flex align-items-center gap-2 p-3 mb-2">
+      <i class="bi bi-leaf-fill fs-3 text-warning"></i>
+      <div>
+        <div class="fw-bold text-white">SADAC</div>
+        <div class="text-white-50 small">Backoffice</div>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <ul class="nav flex-column px-2 flex-grow-1">
+
+      <li>Tableau de bord</li>
+      
+        <a href="{% url 'backoffice:dashboard' %}"
+           class="bo-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i>Dashboard
+        </a>
+      </li>
+
+      <li>Contenu</li>
+        <a href="{% url 'backoffice:product_list' %}"
+           class="bo-nav-link {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-box-seam"></i>Produits
+        </a>
+      </li>
+        <a href="{% url 'backoffice:category_list' %}"
+           class="bo-nav-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-tags"></i>Catégories
+        </a>
+      </li>
+        <a href="{% url 'backoffice:service_list' %}"
+           class="bo-nav-link {% if 'service' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-grid"></i>Services
+        </a>
+      </li>
+        <a href="{% url 'backoffice:event_list' %}"
+           class="bo-nav-link {% if 'event' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-calendar-event"></i>Événements
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'backoffice:gallery_list' %}"
+           class="bo-nav-link {% if 'gallery' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-images"></i>Galerie
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'backoffice:post_list' %}"
+           class="bo-nav-link {% if 'post' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-newspaper"></i>Articles
+        </a>
+      </li>
+
+      <li>Commercial</li>
+      <li>
+        <a href="{% url 'backoffice:order_list' %}"
+           class="bo-nav-link {% if 'order' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-cart-check"></i>Commandes
+          {% if new_orders_count %}
+            <span class="badge bg-danger ms-auto">
+              {{ new_orders_count }}
+            </span>
+          {% endif %}
+        </a>
+      </li>
+
+      <li>Communication</li>
+      <li>
+        <a href="{% url 'backoffice:subscriber_list' %}"
+           class="bo-nav-link {% if 'subscriber' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-people"></i>Abonnés
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'backoffice:send_newsletter' %}"
+           class="bo-nav-link {% if 'newsletter' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-envelope-paper"></i>Newsletter
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'backoffice:message_list' %}"
+           class="bo-nav-link {% if 'message' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-chat-dots"></i>Messages
+          {% if unread_messages_count %}
+            <span class="badge bg-danger ms-auto">
+              {{ unread_messages_count }}
+            </span>
+          {% endif %}
+        </a>
+      </li>
+
+      <li>Configuration</li>
+      <li>
+        <a href="{% url 'backoffice:partner_list' %}"
+           class="bo-nav-link {% if 'partner' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-handshake"></i>Partenaires
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'backoffice:settings' %}"
+           class="bo-nav-link {% if 'settings' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="bi bi-gear"></i>Paramètres
+        </a>
+      </li>
+
+    </ul>
+
+    <!-- User bas de sidebar -->
+    <div class="border-top border-secondary p-3 mt-auto">
+      <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle bg-warning d-flex align-items-center
+                    justify-content-center text-dark fw-bold flex-shrink-0"
+             style="width:36px;height:36px;">
+          {{ request.user.get_full_name|slice:":1"|upper|default:request.user.username|slice:":1"|upper }}
+        </div>
+        <div class="flex-grow-1 overflow-hidden">
+          <div class="text-white small fw-semibold text-truncate">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </div>
+          <div class="text-white-50 small text-truncate">
+            {{ request.user.email }}
+          </div>
+        </div>
+        <a href="{% url 'accounts:logout' %}"
+           class="text-white-50 ms-1" title="Déconnexion">
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+  </nav>
+
+  <!-- ===== CONTENU PRINCIPAL ===== -->
+  <div id="content" class="flex-grow-1 d-flex flex-column">
+
+    <!-- Topbar -->
+    <div class="bo-topbar d-flex align-items-center
+                justify-content-between px-4 py-2">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm btn-outline-secondary"
+                id="sidebarToggle">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 small">
+            <li>
+              <a href="{% url 'backoffice:dashboard' %}"
+                 class="text-decoration-none">Dashboard</a>
+            </li>
+            {% block breadcrumb %}{% endblock %}
+          </ol>
+        </nav>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'core:home' %}" target="_blank"
+           class="btn btn-sm btn-outline-success">
+          <i class="bi bi-eye me-1"></i>Voir le site
+        </a>
+        <span class="text-muted small">
+          <i class="bi bi-person-circle me-1"></i>
+          {{ request.user.get_full_name|default:request.user.username }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Messages Django -->
+    {% if messages %}
+      <div class="px-4 pt-3">
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}
+                      alert-dismissible fade show" role="alert">
+            <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Page content -->
+    <main class="p-4 flex-grow-1">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bo-footer text-center text-muted small py-2 border-top">
+      &copy; {% now "Y" %} SADAC SARL – Backoffice v1.0
+    </footer>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('sidebarToggle').addEventListener('click', () => {
+    document.getElementById('wrapper').classList.toggle('sidebar-collapsed');
+  });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

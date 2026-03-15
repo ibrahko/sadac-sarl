@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Événements – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <h1 class="fw-bold display-5">Nos Événements</h1>
+    <p class="lead opacity-75 mt-2">
+      Formations, ateliers, visites de terrain et bien plus encore
+    </p>
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        >Événements</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== FILTRES ===== -->
+<section class="py-4 bg-light border-bottom">
+  <div class="container">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <span class="fw-semibold text-muted me-2">
+        <i class="bi bi-funnel me-1"></i>Filtrer :
+      </span>
+      <a href="{% url 'events:list' %}"
+         class="btn btn-sm {% if not request.GET.statut %}btn-success{% else %}btn-outline-success{% endif %} rounded-pill px-3">
+        <i class="bi bi-grid me-1"></i>Tous
+      </a>
+      <a href="{% url 'events:list' %}?statut=upcoming"
+         class="btn btn-sm {% if request.GET.statut == 'upcoming' %}btn-success{% else %}btn-outline-success{% endif %} rounded-pill px-3">
+        <i class="bi bi-calendar-event me-1"></i>À venir
+      </a>
+      <a href="{% url 'events:list' %}?statut=past"
+         class="btn btn-sm {% if request.GET.statut == 'past' %}btn-success{% else %}btn-outline-success{% endif %} rounded-pill px-3">
+        <i class="bi bi-calendar-check me-1"></i>Passés
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LISTE ÉVÉNEMENTS ===== -->
+<section class="py-5">
+  <div class="container">
+
+    {% if events %}
+    <div class="row g-4">
+      {% for event in events %}
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100 overflow-hidden">
+          <div class="row g-0 h-100">
+
+            <!-- Image -->
+            <div class="col-md-4">
+              {% if event.banner %}
+                <img src="{{ event.banner.url }}"
+                     alt="{{ event.title }}"
+                     class="img-fluid h-100 w-100"
+                     style="object-fit:cover; min-height:200px;"/>
+              {% else %}
+                <div class="d-flex align-items-center justify-content-center
+                            h-100 w-100"
+                     style="min-height:200px;
+                            background: linear-gradient(135deg,
+                              var(--sadac-green-dark),
+                              var(--sadac-green));">
+                  <i class="bi bi-calendar-event text-white"
+                     style="font-size:3rem;"></i>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Contenu -->
+            <div class="col-md-8 d-flex flex-column">
+              <div class="card-body p-4 flex-grow-1">
+
+                <!-- Statut badge -->
+                {% if event.status == 'upcoming' %}
+                  <span class="badge bg-success mb-2">
+                    <i class="bi bi-clock me-1"></i>À venir
+                  </span>
+                {% elif event.status == 'past' %}
+                  <span class="badge bg-secondary mb-2">
+                    <i class="bi bi-check-circle me-1"></i>Passé
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger mb-2">
+                    <i class="bi bi-x-circle me-1"></i>Annulé
+                  </span>
+                {% endif %}
+
+                <h5 class="fw-bold mb-2">{{ event.title }}</h5>
+
+                <!-- Date -->
+                <p class="text-muted small mb-1">
+                  <i class="bi bi-calendar3 text-success me-2"></i>
+                  {{ event.start_date|date:"d M Y" }}
+                  {% if event.end_date %}
+                    → {{ event.end_date|date:"d M Y" }}
+                  {% endif %}
+                </p>
+
+                <!-- Lieu -->
+                <p class="text-muted small mb-2">
+                  <i class="bi bi-geo-alt text-success me-2"></i>
+                  {{ event.location }}
+                </p>
+
+                <p class="text-muted small">
+                  {{ event.description|truncatewords:20 }}
+                </p>
+              </div>
+
+              <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                <a href="{% url 'events:detail' event.slug %}"
+                   class="btn btn-sadac btn-sm w-100">
+                  <i class="bi bi-arrow-right me-1"></i>
+                  {% if event.status == 'upcoming' %}
+                    Voir les détails
+                  {% else %}
+                    Voir le compte rendu
+                  {% endif %}
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- ===== AUCUN ÉVÉNEMENT / DONNÉES PAR DÉFAUT ===== -->
+    <div class="text-center py-5">
+      <div class="mb-4">
+        <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                     align-items-center justify-content-center"
+              style="width:100px;height:100px;">
+          <i class="bi bi-calendar-event text-success"
+             style="font-size:3rem;"></i>
+        </span>
+      </div>
+      <h3 class="fw-bold text-muted">Aucun événement pour le moment</h3>
+      <p class="text-muted mb-5">
+        Nos prochains événements seront publiés ici très bientôt.<br/>
+        Inscrivez-vous à notre newsletter pour ne rien manquer.
+      </p>
+
+      <!-- Exemples événements par défaut -->
+      <div class="row g-4 text-start">
+
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-center"
+                 style="height:180px;
+                        background:linear-gradient(135deg,
+                          var(--sadac-green-dark),
+                          var(--sadac-green));">
+              <i class="bi bi-mortarboard text-white"
+                 style="font-size:3.5rem;"></i>
+            </div>
+            <div class="card-body p-4">
+              <span class="badge bg-success mb-2">Formation</span>
+              <h5 class="fw-bold">Formation en maraîchage</h5>
+              <p class="text-muted small">
+                <i class="bi bi-calendar3 me-1 text-success"></i>
+                Prochainement
+              </p>
+              <p class="text-muted small">
+                <i class="bi bi-geo-alt me-1 text-success"></i>
+                Bamako, Mali
+              </p>
+              <p class="text-muted small">
+                Formation pratique sur les techniques modernes de maraîchage
+                pour améliorer les rendements.
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-3 px-4">
+              <a href="{% url 'core:contact' %}"
+                 class="btn btn-sadac btn-sm w-100">
+                <i class="bi bi-bell me-1"></i>Être notifié
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-center"
+                 style="height:180px;
+                        background:rgba(245,127,23,0.15);">
+              <i class="bi bi-people" style="font-size:3.5rem;
+                                             color:var(--sadac-orange);"></i>
+            </div>
+            <div class="card-body p-4">
+              <span class="badge bg-warning text-dark mb-2">Atelier</span>
+              <h5 class="fw-bold">Atelier coopératives</h5>
+              <p class="text-muted small">
+                <i class="bi bi-calendar3 me-1 text-success"></i>
+                Prochainement
+              </p>
+              <p class="text-muted small">
+                <i class="bi bi-geo-alt me-1 text-success"></i>
+                Sikasso, Mali
+              </p>
+              <p class="text-muted small">
+                Renforcement des capacités organisationnelles et de gestion
+                des coopératives agricoles.
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-3 px-4">
+              <a href="{% url 'core:contact' %}"
+                 class="btn btn-sadac btn-sm w-100">
+                <i class="bi bi-bell me-1"></i>Être notifié
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-center
+                        bg-success bg-opacity-10" style="height:180px;">
+              <i class="bi bi-binoculars text-success"
+                 style="font-size:3.5rem;"></i>
+            </div>
+            <div class="card-body p-4">
+              <span class="badge bg-success mb-2">Visite terrain</span>
+              <h5 class="fw-bold">Visite de champ</h5>
+              <p class="text-muted small">
+                <i class="bi bi-calendar3 me-1 text-success"></i>
+                Prochainement
+              </p>
+              <p class="text-muted small">
+                <i class="bi bi-geo-alt me-1 text-success"></i>
+                Ségou, Mali
+              </p>
+              <p class="text-muted small">
+                Visite de démonstration sur les nouvelles techniques
+                de culture irriguée dans la région de Ségou.
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-3 px-4">
+              <a href="{% url 'core:contact' %}"
+                 class="btn btn-sadac btn-sm w-100">
+                <i class="bi bi-bell me-1"></i>Être notifié
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Newsletter signup -->
+      <div class="card border-0 shadow-sm mt-5 p-4 p-lg-5">
+        <div class="row align-items-center g-3">
+          <div class="col-lg-7 text-lg-start">
+            <h5 class="fw-bold mb-1">
+              <i class="bi bi-bell text-success me-2"></i>
+              Ne manquez aucun événement
+            </h5>
+            <p class="text-muted mb-0">
+              Inscrivez-vous à notre newsletter pour être informé
+              en premier de nos prochains événements.
+            </p>
+          </div>
+          <div class="col-lg-5">
+            <form method="post" action="{% url 'newsletter:subscribe' %}">
+              {% csrf_token %}
+              <div class="input-group">
+                <input type="email" name="email"
+                       class="form-control"
+                       placeholder="Votre adresse email"
+                       required/>
+                <button class="btn btn-sadac" type="submit">
+                  <i class="bi bi-send me-1"></i>S'inscrire
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Organisons un événement ensemble</h2>
+    <p class="lead opacity-75 mb-4">
+      Vous souhaitez organiser une formation ou un atelier avec SADAC ?
+      Contactez-nous.
+    </p>
+    <a href="{% url 'core:contact' %}"
+       class="btn btn-warning btn-lg px-5 fw-bold">
+      <i class="bi bi-envelope me-2"></i>Nous contacter
+    </a>
+  </div>
+</section>
+
+{% endblock %}

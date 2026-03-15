@@ -1,0 +1,190 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Abonnés Newsletter – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  >Abonnés Newsletter</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-people me-2"></i>Abonnés Newsletter</h4>
+    <p class="text-muted small mb-0">
+      <span class="text-success fw-semibold">{{ total_active }}</span>
+      actif(s) –
+      <span class="text-muted">{{ total_inactive }}</span>
+      inactif(s)
+    </p>
+  </div>
+  <a href="{% url 'backoffice:send_newsletter' %}"
+     class="btn btn-bo-primary btn-sm">
+    <i class="bi bi-envelope-paper me-1"></i>Envoyer newsletter
+  </a>
+</div>
+
+<!-- Barre de recherche -->
+<div class="card border-0 shadow-sm mb-4 p-3">
+  <form method="get" action="{% url 'backoffice:subscriber_list' %}">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <div class="bo-search w-100" style="max-width:100%;">
+          <i class="bi bi-search"></i>
+          <input type="text" name="q"
+                 value="{{ search }}"
+                 class="form-control"
+                 placeholder="Rechercher par email..."/>
+        </div>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-bo-primary btn-sm px-4">
+          <i class="bi bi-search me-1"></i>Rechercher
+        </button>
+        {% if search %}
+          <a href="{% url 'backoffice:subscriber_list' %}"
+             class="btn btn-outline-secondary btn-sm px-3">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        {% endif %}
+      </div>
+      <div class="col-auto ms-auto">
+        <span class="text-muted small">
+          {{ subscribers|length }} résultat(s)
+        </span>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if subscribers %}
+    <div class="table-responsive">
+      <table class="table bo-table mb-0">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Nom</th>
+            <th>Statut</th>
+            <th>Date inscription</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in subscribers %}
+          <tr>
+            <td class="fw-semibold small">
+              <i class="bi bi-envelope text-success me-1"></i>
+              {{ sub.email }}
+            </td>
+            <td class="small text-muted">
+              {{ sub.name|default:"—" }}
+            </td>
+            <td>
+              {% if sub.is_active %}
+                <span class="badge badge-published">Actif</span>
+              {% else %}
+                <span class="badge badge-draft">Inactif</span>
+              {% endif %}
+            </td>
+            <td class="small text-muted">
+              {{ sub.created_at|date:"d M Y à H:i" }}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <!-- Toggle actif/inactif -->
+                <form method="post"
+                      action="/backoffice/newsletter/abonnes/">
+                  {% csrf_token %}
+                  <input type="hidden" name="subscriber_id"
+                         value="{{ sub.pk }}"/>
+                  <input type="hidden" name="action"
+                         value="toggle"/>
+                  <button type="submit"
+                          class="btn btn-sm
+                          {% if sub.is_active %}btn-outline-warning
+                          {% else %}btn-outline-success{% endif %}"
+                          title="{% if sub.is_active %}Désactiver{% else %}Activer{% endif %}">
+                    <i class="bi bi-{% if sub.is_active %}pause{% else %}play{% endif %}"></i>
+                  </button>
+                </form>
+                <!-- Supprimer -->
+                <form method="post"
+                      action="/backoffice/newsletter/abonnes/"
+                      onsubmit="return confirm('Supprimer cet abonné ?')">
+                  {% csrf_token %}
+                  <input type="hidden" name="subscriber_id"
+                         value="{{ sub.pk }}"/>
+                  <input type="hidden" name="action"
+                         value="delete"/>
+                  <button type="submit"
+                          class="btn btn-sm btn-outline-danger"
+                          title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="p-3 border-top d-flex justify-content-center">
+        <ul class="pagination mb-0">
+          {% if page_obj.has_previous %}
+            >
+              <a class="page-link"
+                 href="?page={{ page_obj.previous_page_number }}
+                       {% if search %}&q={{ search }}{% endif %}">
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            
+              {% if page_obj.number == num %}active{% endif %}">
+              <a class="page-link"
+                 href="?page={{ num }}
+                       {% if search %}&q={{ search }}{% endif %}">
+                {{ num }}
+              </a>
+            </li>
+          {% endfor %}
+          {% if page_obj.has_next %}
+            >
+              <a class="page-link"
+                 href="?page={{ page_obj.next_page_number }}
+                       {% if search %}&q={{ search }}{% endif %}">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bo-empty">
+      <i class="bi bi-people"></i>
+      <p>
+        {% if search %}
+          Aucun abonné trouvé pour "{{ search }}".
+        {% else %}
+          Aucun abonné pour le moment.
+        {% endif %}
+      </p>
+      {% if search %}
+        <a href="{% url 'backoffice:subscriber_list' %}"
+           class="btn btn-outline-success btn-sm">
+          Voir tous les abonnés
+        </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

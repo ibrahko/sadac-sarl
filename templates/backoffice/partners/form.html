@@ -1,0 +1,228 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}{{ title }} – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>
+    <a href="{% url 'backoffice:partner_list' %}">Partenaires</a>
+  </li>
+  <li>{{ title }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-handshake me-2"></i>{{ title }}</h4>
+    <p class="text-muted small mb-0">
+      Remplissez les informations du partenaire
+    </p>
+  </div>
+  <a href="{% url 'backoffice:partner_list' %}"
+     class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+<div class="row g-4">
+
+  <!-- Formulaire principal -->
+  <div class="col-lg-7">
+    <div class="card bo-form-card">
+      <div class="card-header">
+        <h6 class="mb-0 fw-bold">
+          <i class="bi bi-info-circle me-2"></i>
+          Informations du partenaire
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+
+            <!-- Nom -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Nom du partenaire <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="name"
+                     value="{{ form.name.value|default:'' }}"
+                     class="form-control"
+                     placeholder="Ex: FAO Mali"
+                     required/>
+            </div>
+
+            <!-- Site web -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Site web
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-link-45deg text-muted"></i>
+                </span>
+                <input type="url" name="website"
+                       value="{{ form.website.value|default:'' }}"
+                       class="form-control"
+                       placeholder="https://www.example.com"/>
+              </div>
+              <div class="form-text">
+                Laissez vide si le partenaire n'a pas de site.
+              </div>
+            </div>
+
+            <!-- Ordre -->
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small">
+                Ordre d'affichage
+              </label>
+              <input type="number" name="order"
+                     value="{{ form.order.value|default:'0' }}"
+                     class="form-control"
+                     min="0"/>
+              <div class="form-text">
+                0 = affiché en premier.
+              </div>
+            </div>
+
+            <!-- Logo -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Logo <span class="text-danger">*</span>
+              </label>
+              {% if form.instance.logo %}
+                <div class="mb-3 p-3 bg-light rounded-3
+                            d-inline-block">
+                  <img src="{{ form.instance.logo.url }}"
+                       alt="{{ form.instance.name }}"
+                       style="max-height:80px;
+                              max-width:200px;
+                              object-fit:contain;"/>
+                  <p class="text-muted small mt-2 mb-0">
+                    Logo actuel
+                  </p>
+                </div>
+              {% endif %}
+              <input type="file" name="logo"
+                     id="logoInput"
+                     class="form-control"
+                     accept="image/*"
+                     {% if not form.instance.logo %}required{% endif %}/>
+              <div class="form-text">
+                Formats : PNG, JPG, SVG. Fond transparent recommandé.
+                Taille max : 1 Mo.
+              </div>
+            </div>
+
+            <!-- Aperçu nouveau logo -->
+            <div class="col-12" id="previewContainer"
+                 style="display:none;">
+              <label class="form-label fw-semibold small">
+                Aperçu
+              </label>
+              <div class="p-3 bg-light rounded-3 d-inline-block">
+                <img id="logoPreview"
+                     src="" alt="Aperçu"
+                     style="max-height:80px;
+                            max-width:200px;
+                            object-fit:contain;"/>
+              </div>
+            </div>
+
+            <!-- Bouton -->
+            <div class="col-12 pt-2">
+              <button type="submit" class="btn btn-bo-primary px-5">
+                <i class="bi bi-check-lg me-2"></i>{{ btn_label }}
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-5">
+
+    <!-- Conseils -->
+    <div class="card border-0 shadow-sm mb-4 p-4">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-lightbulb text-warning me-2"></i>
+        Conseils
+      </h6>
+      <ul class="list-unstyled text-muted small mb-0">
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Utilisez un logo de bonne qualité,
+          de préférence avec fond transparent (PNG).
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          L'ordre détermine la position d'affichage
+          sur le site (0 = premier).
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Ajoutez le site web du partenaire
+          pour que les visiteurs puissent le visiter.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Les logos s'affichent sur la page d'accueil
+          et la page À propos.
+        </li>
+      </ul>
+    </div>
+
+    <!-- Partenaires existants -->
+    <div class="card border-0 shadow-sm p-4">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-grid text-success me-2"></i>
+        Partenaires existants
+      </h6>
+      {% if existing_partners %}
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+          {% for p in existing_partners %}
+            {% if p.logo %}
+              <img src="{{ p.logo.url }}"
+                   alt="{{ p.name }}"
+                   title="{{ p.name }}"
+                   style="max-height:40px;
+                          max-width:80px;
+                          object-fit:contain;
+                          opacity:0.7;"/>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted small mb-0">
+          Aucun autre partenaire pour le moment.
+        </p>
+      {% endif %}
+      <a href="{% url 'backoffice:partner_list' %}"
+         class="btn btn-outline-success btn-sm w-100 mt-3">
+        <i class="bi bi-list me-1"></i>
+        Voir tous les partenaires
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Aperçu logo avant upload
+  document.getElementById('logoInput')
+    .addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('logoPreview').src = ev.target.result;
+        document.getElementById('previewContainer').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+</script>
+{% endblock %}

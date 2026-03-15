@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Actualités – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <h1 class="fw-bold display-5">Actualités & Annonces</h1>
+    <p class="lead opacity-75 mt-2">
+      Restez informés de toutes nos activités et nouveautés
+    </p>
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        >Actualités</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== LISTE ARTICLES ===== -->
+<section class="py-5">
+  <div class="container">
+
+    {% if posts %}
+
+      <p class="text-muted mb-4">
+        <i class="bi bi-newspaper me-1"></i>
+        <strong>{{ page_obj.paginator.count }}</strong> article(s) publié(s)
+      </p>
+
+      <div class="row g-4">
+
+        <!-- Article principal (le plus récent) -->
+        {% for post in posts %}
+        {% if forloop.first %}
+        <div class="col-12">
+          <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="row g-0">
+              <div class="col-lg-6">
+                {% if post.image %}
+                  <img src="{{ post.image.url }}"
+                       alt="{{ post.title }}"
+                       class="img-fluid h-100 w-100"
+                       style="object-fit:cover; min-height:350px;"/>
+                {% else %}
+                  <div class="d-flex align-items-center justify-content-center
+                              h-100"
+                       style="min-height:350px;
+                              background:linear-gradient(135deg,
+                                var(--sadac-green-dark),
+                                var(--sadac-green));">
+                    <i class="bi bi-newspaper text-white"
+                       style="font-size:5rem;"></i>
+                  </div>
+                {% endif %}
+              </div>
+              <div class="col-lg-6 d-flex flex-column">
+                <div class="card-body p-4 p-lg-5 flex-grow-1">
+                  <span class="badge bg-warning text-dark mb-3">
+                    <i class="bi bi-star-fill me-1"></i>À la une
+                  </span>
+                  <h3 class="fw-bold mb-3">{{ post.title }}</h3>
+                  <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="text-muted small">
+                      <i class="bi bi-calendar3 me-1 text-success"></i>
+                      {{ post.published_at|date:"d M Y"|default:"—" }}
+                    </span>
+                    {% if post.author %}
+                      <span class="text-muted small">
+                        <i class="bi bi-person me-1 text-success"></i>
+                        {{ post.author.get_full_name|default:post.author.username }}
+                      </span>
+                    {% endif %}
+                  </div>
+                  <p class="text-muted">
+                    {{ post.excerpt|default:post.content|truncatewords:40 }}
+                  </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-4 px-4 px-lg-5">
+                  <a href="{% url 'blog:detail' post.slug %}"
+                     class="btn btn-sadac px-4">
+                    <i class="bi bi-arrow-right me-1"></i>Lire l'article
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Autres articles -->
+        {% else %}
+        {% if forloop.counter == 2 %}
+        <div class="col-12 mt-4">
+          <h4 class="fw-bold mb-1">Autres articles</h4>
+          <div class="divider-orange mb-4"></div>
+        </div>
+        {% endif %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            {% if post.image %}
+              <img src="{{ post.image.url }}"
+                   alt="{{ post.title }}"
+                   class="card-img-top post-img"/>
+            {% else %}
+              <div class="post-img-placeholder d-flex align-items-center
+                          justify-content-center"
+                   style="background:linear-gradient(135deg,
+                             var(--sadac-green-dark),
+                             var(--sadac-green));">
+                <i class="bi bi-newspaper text-white"
+                   style="font-size:3rem;"></i>
+              </div>
+            {% endif %}
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="text-muted small">
+                  <i class="bi bi-calendar3 me-1 text-success"></i>
+                  {{ post.published_at|date:"d M Y"|default:"—" }}
+                </span>
+              </div>
+              <h5 class="fw-bold mb-2">{{ post.title }}</h5>
+              <p class="text-muted small">
+                {{ post.excerpt|default:post.content|truncatewords:20 }}
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+              <a href="{% url 'blog:detail' post.slug %}"
+                 class="btn btn-sadac btn-sm w-100">
+                <i class="bi bi-arrow-right me-1"></i>Lire l'article
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+      </div>
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+        <nav class="mt-5 d-flex justify-content-center">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+              >
+                <a class="page-link"
+                   href="?page={{ page_obj.previous_page_number }}">
+                  <i class="bi bi-chevron-left"></i>
+                </a>
+              </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+              
+                {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+              </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+              >
+                <a class="page-link"
+                   href="?page={{ page_obj.next_page_number }}">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+
+    {% else %}
+    <!-- ===== DONNÉES PAR DÉFAUT ===== -->
+    <div class="text-center py-3 mb-5">
+      <div class="mb-4">
+        <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                     align-items-center justify-content-center"
+              style="width:100px;height:100px;">
+          <i class="bi bi-newspaper text-success" style="font-size:3rem;"></i>
+        </span>
+      </div>
+      <h3 class="fw-bold text-muted">Aucune actualité pour le moment</h3>
+      <p class="text-muted mb-5">
+        Nos premières publications arrivent bientôt.<br/>
+        Inscrivez-vous à notre newsletter pour être notifié.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      {% for item in "123" %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="d-flex align-items-center justify-content-center"
+               style="height:200px;
+                      background:linear-gradient(135deg,
+                        var(--sadac-green-dark),
+                        var(--sadac-green));">
+            <i class="bi bi-newspaper text-white" style="font-size:3rem;"></i>
+          </div>
+          <div class="card-body p-4">
+            <span class="badge bg-success mb-2">Bientôt</span>
+            <h5 class="fw-bold text-muted">Article en préparation</h5>
+            <p class="text-muted small">
+              Notre équipe prépare du contenu de qualité sur
+              l'agrobusiness, les bonnes pratiques agricoles
+              et les actualités du secteur au Mali.
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-4 px-4">
+            <span class="btn btn-sadac btn-sm w-100 disabled">
+              <i class="bi bi-clock me-1"></i>Bientôt disponible
+            </span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Newsletter -->
+    <div class="card border-0 shadow-sm mt-5 p-4 p-lg-5">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-7 text-lg-start">
+          <h5 class="fw-bold mb-1">
+            <i class="bi bi-bell text-success me-2"></i>
+            Ne manquez aucune actualité
+          </h5>
+          <p class="text-muted mb-0">
+            Inscrivez-vous à notre newsletter pour recevoir
+            nos articles et annonces directement dans votre boîte mail.
+          </p>
+        </div>
+        <div class="col-lg-5">
+          <form method="post" action="{% url 'newsletter:subscribe' %}">
+            {% csrf_token %}
+            <div class="input-group">
+              <input type="email" name="email"
+                     class="form-control"
+                     placeholder="Votre adresse email"
+                     required/>
+              <button class="btn btn-sadac" type="submit">
+                <i class="bi bi-send me-1"></i>S'inscrire
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Une annonce à partager ?</h2>
+    <p class="lead opacity-75 mb-4">
+      Contactez-nous pour toute collaboration ou partenariat éditorial.
+    </p>
+    <a href="{% url 'core:contact' %}"
+       class="btn btn-warning btn-lg px-5 fw-bold">
+      <i class="bi bi-envelope me-2"></i>Nous contacter
+    </a>
+  </div>
+</section>
+
+{% endblock %}

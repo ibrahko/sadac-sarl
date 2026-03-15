@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Accueil – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<section class="hero-section text-center" style="background-image: linear-gradient(rgba(27,94,32,0.75), rgba(27,94,32,0.75)), url('{% static 'img/sadac.jpg' %}');">
+  <div class="container">
+    <h1 class="display-4 fw-bold mb-3">
+      {{ site_settings.slogan|default:"Ensemble pour un agrobusiness durable" }}
+    </h1>
+    <p class="lead opacity-75 mb-4">
+      Conseil &middot; Formation &middot; Production &middot; Commercialisation
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{% url 'services:list' %}" class="btn btn-warning btn-lg px-5 fw-bold">
+        <i class="bi bi-grid me-2"></i>Nos services
+      </a>
+      <a href="{% url 'products:list' %}" class="btn btn-outline-light btn-lg px-5">
+        <i class="bi bi-box-seam me-2"></i>Nos produits
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVICES ===== -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Nos domaines d'intervention</h2>
+      <div class="divider-orange mx-auto mt-2"></div>
+    </div>
+    <div class="row g-4">
+      {% for service in services %}
+      <div class="col-lg-3 col-md-6">
+        <div class="card card-service h-100 shadow-sm border-0 p-4 text-center">
+          <i class="bi bi-{{ service.icon|default:'patch-check' }}
+             fs-1 text-success mb-3"></i>
+          <h5 class="fw-bold">{{ service.title }}</h5>
+          <p class="text-muted small">{{ service.short_description }}</p>
+          <a href="{% url 'services:detail' service.slug %}"
+             class="btn btn-sadac btn-sm mt-auto">
+            En savoir plus
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted">
+        Aucun service disponible pour le moment.
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'services:list' %}" class="btn btn-outline-success px-4">
+        Voir tous nos services
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRODUITS PHARES ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Nos produits phares</h2>
+      <div class="divider-orange mx-auto mt-2"></div>
+    </div>
+    <div class="row g-4">
+      {% for product in products %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-product h-100 shadow-sm border-0">
+          {% if product.image %}
+            <img src="{{ product.image.url }}"
+                 class="card-img-top product-img"
+                 alt="{{ product.title }}"/>
+          {% else %}
+            <div class="product-img-placeholder d-flex align-items-center
+                        justify-content-center bg-light">
+              <i class="bi bi-box-seam fs-1 text-muted"></i>
+            </div>
+          {% endif %}
+          <div class="card-body">
+            <span class="badge bg-success mb-2">
+              {{ product.category }}
+            </span>
+            <h5 class="fw-bold">{{ product.title }}</h5>
+            <p class="text-muted small">
+              {{ product.description|truncatewords:15 }}
+            </p>
+            {% if product.price_info %}
+              <p class="fw-bold text-warning mb-0">{{ product.price_info }}</p>
+            {% endif %}
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3 d-flex gap-2">
+            <a href="{% url 'products:detail' product.slug %}"
+               class="btn btn-sadac btn-sm flex-grow-1">
+              Voir le produit
+            </a>
+            <a href="{% url 'orders:order_product' product.slug %}"
+               class="btn btn-accent btn-sm flex-grow-1">
+              <i class="bi bi-cart-plus me-1"></i>Commander
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted">
+        Aucun produit disponible pour le moment.
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'products:list' %}" class="btn btn-outline-success px-4">
+        Voir tous les produits
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROCHAIN ÉVÉNEMENT ===== -->
+{% if next_events %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Prochains événements</h2>
+      <div class="divider-orange mx-auto mt-2"></div>
+    </div>
+    <div class="row g-4 justify-content-center">
+      {% for event in next_events %}
+      <div class="col-lg-5 col-md-6">
+        <div class="card h-100 shadow-sm border-0 overflow-hidden">
+          {% if event.banner %}
+            <img src="{{ event.banner.url }}"
+                 class="card-img-top event-img" alt="{{ event.title }}"/>
+          {% endif %}
+          <div class="card-body">
+            <span class="badge bg-warning text-dark mb-2">
+              <i class="bi bi-calendar-event me-1"></i>
+              {{ event.start_date|date:"d M Y" }}
+            </span>
+            <h5 class="fw-bold">{{ event.title }}</h5>
+            <p class="text-muted small">
+              <i class="bi bi-geo-alt me-1"></i>{{ event.location }}
+            </p>
+            <p class="text-muted small">
+              {{ event.description|truncatewords:20 }}
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3">
+            <a href="{% url 'events:detail' event.slug %}"
+               class="btn btn-sadac btn-sm w-100">
+              Voir les détails
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'events:list' %}" class="btn btn-outline-success px-4">
+        Tous les événements
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ===== DERNIÈRES ACTUALITÉS ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Dernières actualités</h2>
+      <div class="divider-orange mx-auto mt-2"></div>
+    </div>
+    <div class="row g-4">
+      {% for post in latest_posts %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm border-0">
+          {% if post.image %}
+            <img src="{{ post.image.url }}"
+                 class="card-img-top post-img" alt="{{ post.title }}"/>
+          {% else %}
+            <div class="post-img-placeholder bg-light d-flex
+                        align-items-center justify-content-center">
+              <i class="bi bi-newspaper fs-1 text-muted"></i>
+            </div>
+          {% endif %}
+          <div class="card-body">
+            <p class="text-muted small mb-1">
+              <i class="bi bi-calendar3 me-1"></i>
+              {{ post.published_at|date:"d M Y"|default:"—" }}
+            </p>
+            <h5 class="fw-bold">{{ post.title }}</h5>
+            <p class="text-muted small">
+              {{ post.excerpt|default:post.content|truncatewords:18 }}
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3">
+            <a href="{% url 'blog:detail' post.slug %}"
+               class="btn btn-sadac btn-sm w-100">
+              Lire l'article
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted">
+        Aucune actualité disponible pour le moment.
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'blog:list' %}" class="btn btn-outline-success px-4">
+        Toutes les actualités
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PARTENAIRES ===== -->
+{% if partners %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Nos partenaires</h2>
+      <div class="divider-orange mx-auto mt-2"></div>
+    </div>
+    <div class="row align-items-center justify-content-center g-4">
+      {% for partner in partners %}
+      <div class="col-lg-2 col-md-3 col-4 text-center">
+        {% if partner.website %}
+          <a href="{{ partner.website }}" target="_blank">
+            <img src="{{ partner.logo.url }}" alt="{{ partner.name }}"
+                 class="img-fluid partner-logo grayscale"/>
+          </a>
+        {% else %}
+          <img src="{{ partner.logo.url }}" alt="{{ partner.name }}"
+               class="img-fluid partner-logo grayscale"/>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ===== CTA CONTACT ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Vous avez un projet agricole ?</h2>
+    <p class="lead opacity-75 mb-4">
+      Contactez-nous dès aujourd'hui, notre équipe est à votre disposition.
+    </p>
+    <a href="{% url 'core:contact' %}" class="btn btn-warning btn-lg px-5 fw-bold">
+      <i class="bi bi-envelope me-2"></i>Nous contacter
+    </a>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nos Services – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <h1 class="fw-bold display-5">Nos Services</h1>
+    <p class="lead opacity-75 mt-2">
+      Des solutions adaptées à chaque acteur agricole
+    </p>
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        >Services</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== LISTE DES SERVICES ===== -->
+<section class="py-5">
+  <div class="container">
+
+    {% if services %}
+    <div class="row g-4">
+      {% for service in services %}
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-service h-100 shadow-sm border-0 p-4 text-center">
+          {% if service.image %}
+            <img src="{{ service.image.url }}"
+                 alt="{{ service.title }}"
+                 class="img-fluid rounded-3 mb-3"
+                 style="height:180px; object-fit:cover; width:100%;"/>
+          {% else %}
+            <div class="mb-3">
+              <span class="bg-success bg-opacity-10 rounded-circle
+                           d-inline-flex align-items-center justify-content-center"
+                    style="width:80px; height:80px;">
+                <i class="bi bi-{{ service.icon|default:'patch-check' }}
+                   fs-1 text-success"></i>
+              </span>
+            </div>
+          {% endif %}
+          <h4 class="fw-bold">{{ service.title }}</h4>
+          <p class="text-muted">{{ service.short_description }}</p>
+          <a href="{% url 'services:detail' service.slug %}"
+             class="btn btn-sadac btn-sm mt-auto px-4">
+            <i class="bi bi-arrow-right me-1"></i>En savoir plus
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- ===== DONNÉES PAR DÉFAUT ===== -->
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Ce que nous faisons</h2>
+      <div class="divider-orange mx-auto mt-2"></div>
+      <p class="text-muted mt-3">
+        Découvrez nos domaines d'expertise au service de l'agrobusiness.
+      </p>
+    </div>
+    <div class="row g-4">
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-service h-100 shadow-sm border-0 p-4 text-center">
+          <div class="mb-3">
+            <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                         align-items-center justify-content-center"
+                  style="width:80px;height:80px;">
+              <i class="bi bi-lightbulb fs-1 text-success"></i>
+            </span>
+          </div>
+          <h4 class="fw-bold">Conseil Agricole</h4>
+          <p class="text-muted">
+            Accompagnement stratégique et technique des producteurs,
+            coopératives et organisations agricoles dans la mise en œuvre
+            de leurs projets.
+          </p>
+          <span class="btn btn-sadac btn-sm mt-auto px-4 disabled">
+            Bientôt disponible
+          </span>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-service h-100 shadow-sm border-0 p-4 text-center">
+          <div class="mb-3">
+            <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                         align-items-center justify-content-center"
+                  style="width:80px;height:80px;">
+              <i class="bi bi-mortarboard fs-1 text-success"></i>
+            </span>
+          </div>
+          <h4 class="fw-bold">Formation</h4>
+          <p class="text-muted">
+            Programmes de formation adaptés aux besoins des acteurs ruraux :
+            techniques agricoles, gestion de coopérative, marketing agricole.
+          </p>
+          <span class="btn btn-sadac btn-sm mt-auto px-4 disabled">
+            Bientôt disponible
+          </span>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-service h-100 shadow-sm border-0 p-4 text-center">
+          <div class="mb-3">
+            <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                         align-items-center justify-content-center"
+                  style="width:80px;height:80px;">
+              <i class="bi bi-bar-chart-line fs-1 text-success"></i>
+            </span>
+          </div>
+          <h4 class="fw-bold">Études & Projets</h4>
+          <p class="text-muted">
+            Réalisation d'études de faisabilité, de marché et suivi-évaluation
+            de projets agricoles pour les institutions et bailleurs.
+          </p>
+          <span class="btn btn-sadac btn-sm mt-auto px-4 disabled">
+            Bientôt disponible
+          </span>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-service h-100 shadow-sm border-0 p-4 text-center">
+          <div class="mb-3">
+            <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                         align-items-center justify-content-center"
+                  style="width:80px;height:80px;">
+              <i class="bi bi-tree fs-1 text-success"></i>
+            </span>
+          </div>
+          <h4 class="fw-bold">Production Agricole</h4>
+          <p class="text-muted">
+            Appui à la production végétale et animale avec des techniques
+            modernes et durables adaptées au contexte malien.
+          </p>
+          <span class="btn btn-sadac btn-sm mt-auto px-4 disabled">
+            Bientôt disponible
+          </span>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-service h-100 shadow-sm border-0 p-4 text-center">
+          <div class="mb-3">
+            <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                         align-items-center justify-content-center"
+                  style="width:80px;height:80px;">
+              <i class="bi bi-shop fs-1 text-success"></i>
+            </span>
+          </div>
+          <h4 class="fw-bold">Commercialisation</h4>
+          <p class="text-muted">
+            Mise en relation des producteurs avec les marchés locaux et
+            régionaux, facilitation des circuits de distribution et vente.
+          </p>
+          <span class="btn btn-sadac btn-sm mt-auto px-4 disabled">
+            Bientôt disponible
+          </span>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-service h-100 shadow-sm border-0 p-4 text-center">
+          <div class="mb-3">
+            <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                         align-items-center justify-content-center"
+                  style="width:80px;height:80px;">
+              <i class="bi bi-people fs-1 text-success"></i>
+            </span>
+          </div>
+          <h4 class="fw-bold">Appui aux Coopératives</h4>
+          <p class="text-muted">
+            Structuration, renforcement des capacités et accompagnement
+            organisationnel des coopératives et groupements paysans.
+          </p>
+          <span class="btn btn-sadac btn-sm mt-auto px-4 disabled">
+            Bientôt disponible
+          </span>
+        </div>
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- ===== POURQUOI NOUS CHOISIR ===== -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Pourquoi choisir SADAC ?</h2>
+      <div class="divider-orange mx-auto mt-2"></div>
+    </div>
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-6">
+        <img src="{% static 'img/sadac.jpg' %}"
+             alt="SADAC Terrain"
+             class="img-fluid rounded-3 shadow"/>
+      </div>
+      <div class="col-lg-6">
+        <div class="d-flex gap-3 mb-4">
+          <div class="flex-shrink-0">
+            <span class="bg-success rounded-circle d-flex align-items-center
+                         justify-content-center text-white fw-bold"
+                  style="width:48px;height:48px;">1</span>
+          </div>
+          <div>
+            <h5 class="fw-bold">Expertise de terrain</h5>
+            <p class="text-muted mb-0">
+              Notre équipe connaît les réalités du terrain agricole malien
+              et adapte ses interventions en conséquence.
+            </p>
+          </div>
+        </div>
+        <div class="d-flex gap-3 mb-4">
+          <div class="flex-shrink-0">
+            <span class="bg-success rounded-circle d-flex align-items-center
+                         justify-content-center text-white fw-bold"
+                  style="width:48px;height:48px;">2</span>
+          </div>
+          <div>
+            <h5 class="fw-bold">Approche participative</h5>
+            <p class="text-muted mb-0">
+              Nous impliquons toujours les bénéficiaires dans la conception
+              et la mise en œuvre des projets.
+            </p>
+          </div>
+        </div>
+        <div class="d-flex gap-3 mb-4">
+          <div class="flex-shrink-0">
+            <span class="bg-success rounded-circle d-flex align-items-center
+                         justify-content-center text-white fw-bold"
+                  style="width:48px;height:48px;">3</span>
+          </div>
+          <div>
+            <h5 class="fw-bold">Résultats mesurables</h5>
+            <p class="text-muted mb-0">
+              Nos interventions sont orientées résultats avec des indicateurs
+              clairs et un suivi rigoureux.
+            </p>
+          </div>
+        </div>
+        <div class="d-flex gap-3">
+          <div class="flex-shrink-0">
+            <span class="bg-success rounded-circle d-flex align-items-center
+                         justify-content-center text-white fw-bold"
+                  style="width:48px;height:48px;">4</span>
+          </div>
+          <div>
+            <h5 class="fw-bold">Réseau de partenaires</h5>
+            <p class="text-muted mb-0">
+              Nous disposons d'un réseau solide d'institutions, d'ONG
+              et d'experts pour démultiplier l'impact de nos actions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Un besoin spécifique ?</h2>
+    <p class="lead opacity-75 mb-4">
+      Contactez-nous et nous élaborerons ensemble une solution sur mesure.
+    </p>
+    <a href="{% url 'core:contact' %}"
+       class="btn btn-warning btn-lg px-5 fw-bold">
+      <i class="bi bi-envelope me-2"></i>Nous contacter
+    </a>
+  </div>
+</section>
+
+{% endblock %}

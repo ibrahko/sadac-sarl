@@ -1,0 +1,11 @@
+Django>=4.2
+psycopg2-binary
+python-decouple
+Pillow
+django-crispy-forms
+crispy-bootstrap5
+whitenoise
+gunicorn
+pytest
+pytest-django
+pytest-cov

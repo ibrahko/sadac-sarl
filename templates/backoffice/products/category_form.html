@@ -1,0 +1,86 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}{{ title }} – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>
+    <a href="{% url 'backoffice:product_list' %}">Produits</a>
+  </li>
+  <li>
+    <a href="{% url 'backoffice:category_list' %}">Catégories</a>
+  </li>
+  <li>{{ title }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-tag me-2"></i>{{ title }}</h4>
+  </div>
+  <a href="{% url 'backoffice:category_list' %}"
+     class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card bo-form-card">
+      <div class="card-header">
+        <h6 class="mb-0 fw-bold">
+          <i class="bi bi-tag me-2"></i>
+          Informations de la catégorie
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Nom <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="name"
+                     value="{{ form.name.value|default:'' }}"
+                     class="form-control"
+                     placeholder="Ex: Maraîchage"
+                     required/>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Slug
+                <span class="text-muted fw-normal">
+                  (généré automatiquement si vide)
+                </span>
+              </label>
+              <input type="text" name="slug"
+                     value="{{ form.slug.value|default:'' }}"
+                     class="form-control"
+                     placeholder="ex: maraichage"/>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Description
+              </label>
+              <textarea name="description"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Description optionnelle...">{{ form.description.value|default:'' }}</textarea>
+            </div>
+
+            <div class="col-12 pt-2">
+              <button type="submit" class="btn btn-bo-primary px-5">
+                <i class="bi bi-check-lg me-2"></i>Enregistrer
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

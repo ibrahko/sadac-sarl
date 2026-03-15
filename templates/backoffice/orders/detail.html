@@ -1,0 +1,268 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Commande #{{ order.pk }} – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  >
+    <a href="{% url 'backoffice:order_list' %}">Commandes</a>
+  </li>
+  >Commande #{{ order.pk }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4>
+      <i class="bi bi-cart-check me-2"></i>
+      Commande #{{ order.pk }}
+    </h4>
+    <p class="text-muted small mb-0">
+      Reçue le {{ order.created_at|date:"d M Y à H:i" }}
+    </p>
+  </div>
+  <a href="{% url 'backoffice:order_list' %}"
+     class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+<div class="row g-4">
+
+  <!-- ===== DÉTAILS ===== -->
+  <div class="col-lg-8">
+
+    <!-- Infos client -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h6 class="fw-bold">
+          <i class="bi bi-person text-success me-2"></i>
+          Informations client
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Nom complet</p>
+            <p class="fw-semibold mb-0">{{ order.full_name }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Téléphone</p>
+            <p class="fw-semibold mb-0">
+              <a href="tel:{{ order.phone }}"
+                 class="text-dark text-decoration-none">
+                <i class="bi bi-telephone text-success me-1"></i>
+                {{ order.phone }}
+              </a>
+            </p>
+          </div>
+          {% if order.email %}
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Email</p>
+            <p class="fw-semibold mb-0">
+              <a href="mailto:{{ order.email }}"
+                 class="text-dark text-decoration-none">
+                <i class="bi bi-envelope text-success me-1"></i>
+                {{ order.email }}
+              </a>
+            </p>
+          </div>
+          {% endif %}
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Date de commande</p>
+            <p class="fw-semibold mb-0">
+              <i class="bi bi-calendar3 text-success me-1"></i>
+              {{ order.created_at|date:"d M Y à H:i" }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Infos produit -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h6 class="fw-bold">
+          <i class="bi bi-box-seam text-success me-2"></i>
+          Produit commandé
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        {% if order.product %}
+          <div class="d-flex align-items-center gap-4 flex-wrap">
+            {% if order.product.image %}
+              <img src="{{ order.product.image.url }}"
+                   alt="{{ order.product.title }}"
+                   class="rounded-3 flex-shrink-0"
+                   style="width:80px;height:80px;
+                          object-fit:cover;"/>
+            {% else %}
+              <div class="rounded-3 bg-success bg-opacity-10
+                          d-flex align-items-center
+                          justify-content-center flex-shrink-0"
+                   style="width:80px;height:80px;">
+                <i class="bi bi-box-seam text-success fs-2"></i>
+              </div>
+            {% endif %}
+            <div class="flex-grow-1">
+              <h6 class="fw-bold mb-1">{{ order.product.title }}</h6>
+              <p class="text-muted small mb-1">
+                Catégorie :
+                {{ order.product.category|default:"—" }}
+              </p>
+              {% if order.product.price_info %}
+                <p class="text-warning fw-semibold mb-0">
+                  <i class="bi bi-tag me-1"></i>
+                  {{ order.product.price_info }}
+                </p>
+              {% endif %}
+            </div>
+            <div class="text-center flex-shrink-0">
+              <p class="text-muted small mb-1">Quantité</p>
+              <span class="badge bg-success fs-5 px-3 py-2">
+                x{{ order.quantity }}
+              </span>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-warning mb-0">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Ce produit a été supprimé du catalogue.
+          </div>
+        {% endif %}
+
+        {% if order.message %}
+          <hr class="my-3"/>
+          <p class="text-muted small mb-2 fw-semibold">
+            <i class="bi bi-chat-left-text me-1"></i>
+            Message du client :
+          </p>
+          <div class="bg-light rounded-3 p-3">
+            <p class="mb-0 small lh-lg">{{ order.message }}</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== SIDEBAR ACTIONS ===== -->
+  <div class="col-lg-4">
+
+    <!-- Statut actuel + changement -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h6 class="fw-bold">
+          <i class="bi bi-gear text-success me-2"></i>
+          Statut de la commande
+        </h6>
+      </div>
+      <div class="card-body p-4">
+
+        <!-- Badge statut actuel -->
+        <div class="text-center mb-4">
+          {% if order.status == 'new' %}
+            <span class="badge badge-new fs-6 px-4 py-2">
+              <i class="bi bi-clock me-1"></i>Nouveau
+            </span>
+          {% elif order.status == 'processing' %}
+            <span class="badge badge-processing fs-6 px-4 py-2">
+              <i class="bi bi-arrow-repeat me-1"></i>En cours
+            </span>
+          {% elif order.status == 'delivered' %}
+            <span class="badge badge-delivered fs-6 px-4 py-2">
+              <i class="bi bi-check-circle me-1"></i>Livré
+            </span>
+          {% else %}
+            <span class="badge badge-cancelled fs-6 px-4 py-2">
+              <i class="bi bi-x-circle me-1"></i>Annulé
+            </span>
+          {% endif %}
+        </div>
+
+        <!-- Formulaire changement de statut -->
+        <form method="post"
+              action="{% url 'backoffice:order_update_status' order.pk %}">
+          {% csrf_token %}
+          <label class="form-label fw-semibold small">
+            Changer le statut
+          </label>
+          <select name="status" class="form-select mb-3">
+            {% for value, label in status_choices %}
+              <option value="{{ value }}"
+                {% if order.status == value %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-bo-primary w-100">
+            <i class="bi bi-check-lg me-2"></i>
+            Mettre à jour le statut
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h6 class="fw-bold">
+          <i class="bi bi-lightning text-warning me-2"></i>
+          Actions rapides
+        </h6>
+      </div>
+      <div class="card-body p-4 d-flex flex-column gap-2">
+
+        {% if order.phone %}
+          <a href="tel:{{ order.phone }}"
+             class="btn btn-outline-success w-100">
+            <i class="bi bi-telephone me-2"></i>
+            Appeler {{ order.full_name }}
+          </a>
+          <a href="https://wa.me/{{ order.phone }}"
+             target="_blank"
+             class="btn btn-success w-100">
+            <i class="bi bi-whatsapp me-2"></i>
+            WhatsApp
+          </a>
+        {% endif %}
+
+        {% if order.email %}
+          <a href="mailto:{{ order.email }}"
+             class="btn btn-outline-primary w-100">
+            <i class="bi bi-envelope me-2"></i>
+            Envoyer un email
+          </a>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- Infos produit rapide -->
+    {% if order.product %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h6 class="fw-bold">
+          <i class="bi bi-box-seam text-success me-2"></i>
+          Fiche produit
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <p class="fw-semibold small mb-1">
+          {{ order.product.title }}
+        </p>
+        <p class="text-muted small mb-3">
+          {{ order.product.description|truncatewords:15 }}
+        </p>
+        <a href="{% url 'backoffice:product_update' order.product.pk %}"
+           class="btn btn-outline-success btn-sm w-100">
+          <i class="bi bi-pencil me-1"></i>
+          Modifier le produit
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ service.title }} – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <div class="mb-3">
+      <span class="bg-white bg-opacity-10 rounded-circle d-inline-flex
+                   align-items-center justify-content-center"
+            style="width:80px;height:80px;">
+        <i class="bi bi-{{ service.icon|default:'patch-check' }}
+           fs-1 text-warning"></i>
+      </span>
+    </div>
+    <h1 class="fw-bold display-5">{{ service.title }}</h1>
+    <p class="lead opacity-75 mt-2">{{ service.short_description }}</p>
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        >
+          <a href="{% url 'services:list' %}" class="text-warning">Services</a>
+        </li>
+        >{{ service.title }}</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== CONTENU PRINCIPAL ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+
+      <!-- Description complète -->
+      <div class="col-lg-8">
+        {% if service.image %}
+          <img src="{{ service.image.url }}"
+               alt="{{ service.title }}"
+               class="img-fluid rounded-3 shadow mb-4 w-100"
+               style="height:350px; object-fit:cover;"/>
+        {% else %}
+          <div class="rounded-3 mb-4 d-flex align-items-center
+                      justify-content-center"
+               style="height:350px;
+                      background: linear-gradient(135deg,
+                        var(--sadac-green-dark),
+                        var(--sadac-green));">
+            <i class="bi bi-{{ service.icon|default:'patch-check' }}
+               text-white" style="font-size:6rem;"></i>
+          </div>
+        {% endif %}
+
+        <h2 class="fw-bold mb-3">Description du service</h2>
+        <div class="divider-orange mb-4"></div>
+        <div class="text-muted lh-lg">
+          {{ service.description|linebreaks }}
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+
+        <!-- Carte contact rapide -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-top: 4px solid var(--sadac-orange) !important;">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">
+              <i class="bi bi-headset text-success me-2"></i>
+              Intéressé par ce service ?
+            </h5>
+            <p class="text-muted small">
+              Contactez-nous dès aujourd'hui pour en savoir plus
+              ou demander un devis personnalisé.
+            </p>
+            <a href="{% url 'core:contact' %}"
+               class="btn btn-sadac w-100 mb-2">
+              <i class="bi bi-envelope me-2"></i>Nous écrire
+            </a>
+            {% if site_settings and site_settings.whatsapp %}
+              <a href="https://wa.me/{{ site_settings.whatsapp }}"
+                 target="_blank"
+                 class="btn btn-success w-100">
+                <i class="bi bi-whatsapp me-2"></i>WhatsApp
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Autres services -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">
+              <i class="bi bi-grid text-success me-2"></i>
+              Autres services
+            </h5>
+            <ul class="list-unstyled mb-0">
+              {% for item in other_services %}
+                >
+                  <a href="{% url 'services:detail' item.slug %}"
+                     class="d-flex align-items-center gap-2
+                            text-decoration-none text-dark
+                            p-2 rounded hover-green">
+                    <i class="bi bi-{{ item.icon|default:'patch-check' }}
+                       text-success"></i>
+                    <span>{{ item.title }}</span>
+                    <i class="bi bi-arrow-right ms-auto text-muted small"></i>
+                  </a>
+                </li>
+              {% empty %}
+                >Aucun autre service.</li>
+              {% endfor %}
+            </ul>
+            <a href="{% url 'services:list' %}"
+               class="btn btn-outline-success btn-sm w-100 mt-3">
+              Voir tous les services
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Prêt à démarrer votre projet ?</h2>
+    <p class="lead opacity-75 mb-4">
+      Notre équipe est disponible pour vous accompagner à chaque étape.
+    </p>
+    <a href="{% url 'core:contact' %}"
+       class="btn btn-warning btn-lg px-5 fw-bold">
+      <i class="bi bi-envelope me-2"></i>Nous contacter
+    </a>
+  </div>
+</section>
+
+{% endblock %}

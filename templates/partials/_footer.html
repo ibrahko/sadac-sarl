@@ -1,0 +1,75 @@
+{% load static %}
+<footer class="pt-5 pb-3 mt-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <h5 class="fw-bold mb-3">SADAC SARL</h5>
+        <p class="opacity-75 small">
+          Société Africaine pour le Développement de l'Agrobusiness et le Conseil.
+          Nous accompagnons les acteurs agricoles vers l'excellence.
+        </p>
+        <div class="d-flex gap-3 mt-3">
+          {% if site_settings and site_settings.facebook_url %}
+            <a href="{{ site_settings.facebook_url }}" target="_blank"
+               class="text-white fs-5"><i class="bi bi-facebook"></i></a>
+          {% endif %}
+          {% if site_settings and site_settings.youtube_url %}
+            <a href="{{ site_settings.youtube_url }}" target="_blank"
+               class="text-white fs-5"><i class="bi bi-youtube"></i></a>
+          {% endif %}
+          {% if site_settings and site_settings.whatsapp %}
+            <a href="https://wa.me/{{ site_settings.whatsapp }}" target="_blank"
+               class="text-white fs-5"><i class="bi bi-whatsapp"></i></a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-4">
+        <h6 class="fw-bold mb-3 text-warning">Liens rapides</h6>
+        <ul class="list-unstyled">
+          <li><a href="{% url 'core:home' %}" class="footer-link">Accueil</a></li>
+          <li><a href="{% url 'core:about' %}" class="footer-link">À propos</a></li>
+          <li><a href="{% url 'services:list' %}" class="footer-link">Services</a></li>
+          <li><a href="{% url 'products:list' %}" class="footer-link">Produits</a></li>
+          <li><a href="{% url 'events:list' %}" class="footer-link">Événements</a></li>
+          <li><a href="{% url 'blog:list' %}" class="footer-link">Actualités</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3 col-md-4">
+        <h6 class="fw-bold mb-3 text-warning">Contact</h6>
+        <ul class="list-unstyled opacity-75 small">
+          {% if site_settings and site_settings.address %}
+            <li>
+              <i class="bi bi-geo-alt me-2"></i>{{ site_settings.address }}
+            </li>
+          {% endif %}
+          {% if site_settings and site_settings.phone1 %}
+          <li>
+              <i class="bi bi-telephone me-2"></i>{{ site_settings.phone1 }}
+            </li>
+          {% endif %}
+          {% if site_settings and site_settings.email %}
+          <li>
+              <i class="bi bi-envelope me-2"></i>{{ site_settings.email }}
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="col-lg-3 col-md-4">
+        <h6 class="fw-bold mb-3 text-warning">Newsletter</h6>
+        <p class="opacity-75 small">Recevez nos actualités et événements.</p>
+        <form method="post" action="{% url 'newsletter:subscribe' %}">
+          {% csrf_token %}
+          <div class="input-group">
+            <input type="email" name="email" class="form-control form-control-sm"
+                   placeholder="Votre email" required/>
+            <button class="btn btn-warning btn-sm" type="submit">OK</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <hr class="border-secondary mt-4"/>
+    <p class="text-center opacity-50 small mb-0">
+      &copy; {% now "Y" %} SADAC SARL – Tous droits réservés.
+    </p>
+  </div>
+</footer>

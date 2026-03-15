@@ -1,0 +1,133 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Galerie – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>Galerie</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-images me-2"></i>Galerie photos & vidéos</h4>
+    <p class="text-muted small mb-0">
+      {{ galleries|length }} album(s) au total
+    </p>
+  </div>
+  <a href="{% url 'backoffice:gallery_create' %}"
+     class="btn btn-bo-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Créer un album
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if galleries %}
+    <div class="table-responsive">
+      <table class="table bo-table mb-0">
+        <thead>
+          <tr>
+            <th>Album</th>
+            <th>Événement lié</th>
+            <th>Médias</th>
+            <th>Date création</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for gallery in galleries %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                {% with gallery.medias.first as first_media %}
+                  {% if first_media and first_media.file %}
+                    <img src="{{ first_media.file.url }}"
+                         alt="{{ gallery.title }}"
+                         class="bo-img-preview"/>
+                  {% elif gallery.event and gallery.event.banner %}
+                    <img src="{{ gallery.event.banner.url }}"
+                         alt="{{ gallery.title }}"
+                         class="bo-img-preview"/>
+                  {% else %}
+                    <div class="bo-img-preview bg-success bg-opacity-10
+                                d-flex align-items-center
+                                justify-content-center">
+                      <i class="bi bi-images text-success"></i>
+                    </div>
+                  {% endif %}
+                {% endwith %}
+                <div>
+                  <div class="fw-semibold small">
+                    {{ gallery.title }}
+                  </div>
+                  {% if gallery.description %}
+                    <div class="text-muted small">
+                      {{ gallery.description|truncatewords:8 }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td class="small">
+              {% if gallery.event %}
+                <span class="badge bg-success bg-opacity-10
+                             text-success">
+                  <i class="bi bi-calendar-event me-1"></i>
+                  {{ gallery.event.title|truncatewords:4 }}
+                </span>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <span class="badge bg-success px-3">
+                {{ gallery.medias.count }}
+              </span>
+            </td>
+            <td class="small text-muted">
+              {{ gallery.created_at|date:"d M Y" }}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'backoffice:gallery_update' gallery.pk %}"
+                   class="btn btn-sm btn-outline-success"
+                   title="Modifier / Ajouter médias">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'backoffice:media_create' gallery.pk %}"
+                   class="btn btn-sm btn-outline-primary"
+                   title="Ajouter un média">
+                  <i class="bi bi-plus-lg"></i>
+                </a>
+                <a href="{% url 'media_gallery:detail' gallery.pk %}"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-secondary"
+                   title="Voir sur le site">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'backoffice:gallery_delete' gallery.pk %}"
+                   class="btn btn-sm btn-outline-danger"
+                   title="Supprimer"
+                   onclick="return confirm('Supprimer cet album et tous ses médias ?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bo-empty">
+      <i class="bi bi-images"></i>
+      <p>Aucun album créé pour le moment.</p>
+      <a href="{% url 'backoffice:gallery_create' %}"
+         class="btn btn-bo-primary btn-sm">
+        Créer le premier album
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

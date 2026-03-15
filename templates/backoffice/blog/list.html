@@ -1,0 +1,111 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Articles – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+ <li>Articles</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-newspaper me-2"></i>Articles</h4>
+    <p class="text-muted small mb-0">
+      {{ posts|length }} article(s) au total
+    </p>
+  </div>
+  <a href="{% url 'backoffice:post_create' %}"
+     class="btn btn-bo-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Écrire un article
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if posts %}
+    <div class="table-responsive">
+      <table class="table bo-table mb-0">
+        <thead>
+          <tr>
+            <th>Article</th>
+            <th>Auteur</th>
+            <th>Statut</th>
+            <th>Date publication</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for post in posts %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                {% if post.image %}
+                  <img src="{{ post.image.url }}"
+                       class="bo-img-preview"
+                       alt="{{ post.title }}"/>
+                {% else %}
+                  <div class="bo-img-preview bg-primary bg-opacity-10
+                              d-flex align-items-center
+                              justify-content-center">
+                    <i class="bi bi-newspaper text-primary"></i>
+                  </div>
+                {% endif %}
+                <div>
+                  <div class="fw-semibold small">{{ post.title }}</div>
+                  <div class="text-muted small">
+                    {{ post.excerpt|default:post.content|truncatewords:10 }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="small text-muted">
+              {{ post.author.get_full_name|default:post.author.username|default:"—" }}
+            </td>
+            <td>
+              {% if post.status == 'published' %}
+                <span class="badge badge-published">Publié</span>
+              {% else %}
+                <span class="badge badge-draft">Brouillon</span>
+              {% endif %}
+            </td>
+            <td class="small text-muted">
+              {{ post.published_at|date:"d M Y"|default:"—" }}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'backoffice:post_update' post.pk %}"
+                   class="btn btn-sm btn-outline-success"
+                   title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'blog:detail' post.slug %}"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-secondary"
+                   title="Voir sur le site">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'backoffice:post_delete' post.pk %}"
+                   class="btn btn-sm btn-outline-danger"
+                   title="Supprimer">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bo-empty">
+      <i class="bi bi-newspaper"></i>
+      <p>Aucun article rédigé pour le moment.</p>
+      <a href="{% url 'backoffice:post_create' %}"
+         class="btn btn-bo-primary btn-sm">
+        Écrire le premier article
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Messages – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>Messages</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-chat-dots me-2"></i>Messages reçus</h4>
+    <p class="text-muted small mb-0">
+      {% if unread_count %}
+        <span class="badge bg-danger me-1">{{ unread_count }}</span>
+        message(s) non lu(s)
+      {% else %}
+        Tous les messages sont lus
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if contact_messages %}
+    <div class="table-responsive">
+      <table class="table bo-table mb-0">
+        <thead>
+          <tr>
+            <th>Expéditeur</th>
+            <th>Sujet</th>
+            <th>Contact</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for msg in contact_messages %}
+          <tr {% if not msg.is_read %}
+              style="background:rgba(46,125,50,0.04);
+                     font-weight:500;"
+              {% endif %}>
+
+            <!-- Expéditeur -->
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle d-flex align-items-center
+                            justify-content-center fw-bold flex-shrink-0
+                            {% if not msg.is_read %}
+                              bg-success text-white
+                            {% else %}
+                              bg-light text-muted
+                            {% endif %}"
+                     style="width:38px;height:38px;font-size:0.9rem;">
+                  {{ msg.name|slice:":1"|upper }}
+                </div>
+                <div>
+                  <div class="small fw-semibold">{{ msg.name }}</div>
+                  {% if msg.email %}
+                    <div class="text-muted small">{{ msg.email }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+
+            <!-- Sujet -->
+            <td class="small">
+              <span class="fw-semibold">{{ msg.subject }}</span>
+              <div class="text-muted">
+                {{ msg.message|truncatewords:8 }}
+              </div>
+            </td>
+
+            <!-- Contact -->
+            <td class="small">
+              {% if msg.phone %}
+                <a href="tel:{{ msg.phone }}"
+                   class="text-dark text-decoration-none d-block">
+                  <i class="bi bi-telephone text-success me-1"></i>
+                  {{ msg.phone }}
+                </a>
+              {% endif %}
+              {% if msg.email %}
+                <a href="mailto:{{ msg.email }}"
+                   class="text-dark text-decoration-none d-block">
+                  <i class="bi bi-envelope text-success me-1"></i>
+                  {{ msg.email }}
+                </a>
+              {% endif %}
+            </td>
+
+            <!-- Date -->
+            <td class="small text-muted">
+              <div>{{ msg.created_at|date:"d M Y" }}</div>
+              <div>{{ msg.created_at|date:"H:i" }}</div>
+            </td>
+
+            <!-- Statut -->
+            <td>
+              {% if not msg.is_read %}
+                <span class="badge bg-danger">
+                  <i class="bi bi-circle-fill me-1"
+                     style="font-size:0.5rem;"></i>
+                  Non lu
+                </span>
+              {% else %}
+                <span class="badge bg-light text-muted border">
+                  <i class="bi bi-check2 me-1"></i>Lu
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'backoffice:message_detail' msg.pk %}"
+                   class="btn btn-sm btn-outline-success"
+                   title="Lire le message">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if msg.phone %}
+                  <a href="https://wa.me/{{ msg.phone }}"
+                     target="_blank"
+                     class="btn btn-sm btn-success"
+                     title="WhatsApp">
+                    <i class="bi bi-whatsapp"></i>
+                  </a>
+                {% endif %}
+                <a href="{% url 'backoffice:message_delete' msg.pk %}"
+                   class="btn btn-sm btn-outline-danger"
+                   title="Supprimer"
+                   onclick="return confirm('Supprimer ce message ?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="p-3 border-top d-flex justify-content-center">
+        <ul class="pagination mb-0">
+          {% if page_obj.has_previous %}
+            <li>
+              <a class="page-link"
+                 href="?page={{ page_obj.previous_page_number }}">
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            
+              {% if page_obj.number == num %}active{% endif %}">
+              <a class="page-link" href="?page={{ num }}">
+                {{ num }}
+              </a>
+            </li>
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li>
+              <a class="page-link"
+                 href="?page={{ page_obj.next_page_number }}">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bo-empty">
+      <i class="bi bi-chat-square-x"></i>
+      <p>Aucun message reçu pour le moment.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

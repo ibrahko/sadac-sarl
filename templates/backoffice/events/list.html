@@ -1,0 +1,123 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Événements – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+ <li>Événements</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-calendar-event me-2"></i>Événements</h4>
+    <p class="text-muted small mb-0">
+      {{ events|length }} événement(s) au total
+    </p>
+  </div>
+  <a href="{% url 'backoffice:event_create' %}"
+     class="btn btn-bo-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Ajouter un événement
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if events %}
+    <div class="table-responsive">
+      <table class="table bo-table mb-0">
+        <thead>
+          <tr>
+            <th>Événement</th>
+            <th>Date</th>
+            <th>Lieu</th>
+            <th>Statut</th>
+            <th>Galeries</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in events %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                {% if event.banner %}
+                  <img src="{{ event.banner.url }}"
+                       class="bo-img-preview"
+                       alt="{{ event.title }}"/>
+                {% else %}
+                  <div class="bo-img-preview bg-success bg-opacity-10
+                              d-flex align-items-center
+                              justify-content-center">
+                    <i class="bi bi-calendar-event text-success"></i>
+                  </div>
+                {% endif %}
+                <div>
+                  <div class="fw-semibold small">{{ event.title }}</div>
+                  <div class="text-muted small">
+                    {{ event.description|truncatewords:8 }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="small">
+              <div>{{ event.start_date|date:"d M Y" }}</div>
+              {% if event.end_date %}
+                <div class="text-muted">
+                  → {{ event.end_date|date:"d M Y" }}
+                </div>
+              {% endif %}
+            </td>
+            <td class="small text-muted">
+              <i class="bi bi-geo-alt me-1"></i>
+              {{ event.location }}
+            </td>
+            <td>
+              {% if event.status == 'upcoming' %}
+                <span class="badge badge-upcoming">À venir</span>
+              {% elif event.status == 'past' %}
+                <span class="badge badge-past">Passé</span>
+              {% else %}
+                <span class="badge badge-cancelled">Annulé</span>
+              {% endif %}
+            </td>
+            <td class="small text-muted text-center">
+              {{ event.galleries.count }}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'backoffice:event_update' event.pk %}"
+                   class="btn btn-sm btn-outline-success"
+                   title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'events:detail' event.slug %}"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-secondary"
+                   title="Voir sur le site">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'backoffice:event_delete' event.pk %}"
+                   class="btn btn-sm btn-outline-danger"
+                   title="Supprimer">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bo-empty">
+      <i class="bi bi-calendar-x"></i>
+      <p>Aucun événement créé pour le moment.</p>
+      <a href="{% url 'backoffice:event_create' %}"
+         class="btn btn-bo-primary btn-sm">
+        Créer le premier événement
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold fs-4" href="{% url 'core:home' %}">
+      {% if site_settings and site_settings.logo %}
+        <img src="{{ site_settings.logo.url }}" height="45" alt="SADAC"/>
+      {% else %}
+        🌿 SADAC
+      {% endif %}
+    </a>
+    <button class="navbar-toggler border-0" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-1">
+        <li>
+          <a class="nav-link" href="{% url 'core:home' %}">Accueil</a>
+        </li>
+        <li>
+          <a class="nav-link" href="{% url 'core:about' %}">À propos</a>
+        </li>
+        <li>
+          <a class="nav-link" href="{% url 'services:list' %}">Services</a>
+        </li>
+        <li>
+          <a class="nav-link" href="{% url 'products:list' %}">Produits</a>
+        </li>
+        <li>
+          <a class="nav-link" href="{% url 'events:list' %}">Événements</a>
+        </li>
+        <li>
+          <a class="nav-link" href="{% url 'blog:list' %}">Actualités</a>
+        </li>
+        <li>
+          <a class="nav-link" href="{% url 'media_gallery:list' %}">Galerie</a>
+        </li>
+        <li>
+          <a class="nav-link" href="{% url 'core:contact' %}">Contact</a>
+        </li>
+        {% if user.is_authenticated %}
+        <li>
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i>
+              {{ user.get_full_name|default:user.username }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              {% if user.is_staff %}
+                >
+                  <a class="dropdown-item" href="/admin/">
+                    <i class="bi bi-speedometer2 me-2"></i>Administration
+                  </a>
+                </li>
+                ><hr class="dropdown-divider"/></li>
+              {% endif %}
+              <li>
+                <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                  <i class="bi bi-person me-2"></i>Mon profil
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                  <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                </a>
+              </li>
+            </ul>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

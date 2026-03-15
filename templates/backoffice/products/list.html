@@ -1,0 +1,114 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Produits – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  >Produits</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-box-seam me-2"></i>Produits</h4>
+    <p class="text-muted small mb-0">
+      {{ products|length }} produit(s) au total
+    </p>
+  </div>
+  <a href="{% url 'backoffice:product_create' %}"
+     class="btn btn-bo-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Ajouter un produit
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if products %}
+    <div class="table-responsive">
+      <table class="table bo-table mb-0">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Catégorie</th>
+            <th>Prix</th>
+            <th>Statut</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}"
+                       class="bo-img-preview"
+                       alt="{{ product.title }}"/>
+                {% else %}
+                  <div class="bo-img-preview bg-success bg-opacity-10
+                              d-flex align-items-center justify-content-center">
+                    <i class="bi bi-box-seam text-success"></i>
+                  </div>
+                {% endif %}
+                <div>
+                  <div class="fw-semibold small">{{ product.title }}</div>
+                  <div class="text-muted small">
+                    {{ product.description|truncatewords:8 }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="small">
+              {{ product.category|default:"—" }}
+            </td>
+            <td class="small text-muted">
+              {{ product.price_info|default:"—" }}
+            </td>
+            <td>
+              {% if product.is_active %}
+                <span class="badge badge-published">Actif</span>
+              {% else %}
+                <span class="badge badge-draft">Inactif</span>
+              {% endif %}
+            </td>
+            <td class="small text-muted">
+              {{ product.created_at|date:"d M Y" }}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'backoffice:product_update' product.pk %}"
+                   class="btn btn-sm btn-outline-success"
+                   title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'products:detail' product.slug %}"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-secondary"
+                   title="Voir sur le site">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'backoffice:product_delete' product.pk %}"
+                   class="btn btn-sm btn-outline-danger"
+                   title="Supprimer">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bo-empty">
+      <i class="bi bi-box-seam"></i>
+      <p>Aucun produit créé pour le moment.</p>
+      <a href="{% url 'backoffice:product_create' %}"
+         class="btn btn-bo-primary btn-sm">
+        Ajouter le premier produit
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

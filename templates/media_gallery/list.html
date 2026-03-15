@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Galerie – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <h1 class="fw-bold display-5">Notre Galerie</h1>
+    <p class="lead opacity-75 mt-2">
+      Photos et vidéos de nos activités, formations et événements
+    </p>
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        >Galerie</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== ALBUMS ===== -->
+<section class="py-5">
+  <div class="container">
+
+    {% if galleries %}
+
+      <p class="text-muted mb-4">
+        <i class="bi bi-images me-1"></i>
+        <strong>{{ galleries|length }}</strong> album(s) disponible(s)
+      </p>
+
+      <div class="row g-4">
+        {% for gallery in galleries %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card border-0 shadow-sm h-100 overflow-hidden gallery-card">
+
+            <!-- Aperçu image du premier média -->
+            {% with gallery.medias.first as first_media %}
+              {% if first_media and first_media.file %}
+                <div class="position-relative overflow-hidden"
+                     style="height:220px;">
+                  <img src="{{ first_media.file.url }}"
+                       alt="{{ gallery.title }}"
+                       class="w-100 h-100 gallery-thumb"
+                       style="object-fit:cover;
+                              transition:transform 0.4s;"/>
+                  <div class="gallery-overlay position-absolute top-0
+                              start-0 w-100 h-100 d-flex align-items-center
+                              justify-content-center">
+                    <i class="bi bi-eye text-white"
+                       style="font-size:2.5rem;
+                              opacity:0;
+                              transition:opacity 0.3s;"
+                       class="overlay-icon"></i>
+                  </div>
+                </div>
+              {% elif gallery.event and gallery.event.banner %}
+                <div class="position-relative overflow-hidden"
+                     style="height:220px;">
+                  <img src="{{ gallery.event.banner.url }}"
+                       alt="{{ gallery.title }}"
+                       class="w-100 h-100 gallery-thumb"
+                       style="object-fit:cover;
+                              transition:transform 0.4s;"/>
+                </div>
+              {% else %}
+                <div class="d-flex align-items-center justify-content-center"
+                     style="height:220px;
+                            background:linear-gradient(135deg,
+                              var(--sadac-green-dark),
+                              var(--sadac-green));">
+                  <i class="bi bi-images text-white"
+                     style="font-size:3.5rem;"></i>
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <!-- Badge nombre de médias -->
+            <div class="position-absolute top-0 end-0 m-2">
+              <span class="badge"
+                    style="background:rgba(0,0,0,0.6);">
+                <i class="bi bi-images me-1"></i>
+                {{ gallery.medias.count }} média(s)
+              </span>
+            </div>
+
+            <!-- Contenu -->
+            <div class="card-body p-4">
+              {% if gallery.event %}
+                <span class="badge bg-success mb-2">
+                  <i class="bi bi-calendar-event me-1"></i>
+                  {{ gallery.event.title|truncatewords:4 }}
+                </span>
+              {% else %}
+                <span class="badge bg-warning text-dark mb-2">
+                  <i class="bi bi-images me-1"></i>Album
+                </span>
+              {% endif %}
+
+              <h5 class="fw-bold mb-2">{{ gallery.title }}</h5>
+
+              {% if gallery.description %}
+                <p class="text-muted small mb-2">
+                  {{ gallery.description|truncatewords:15 }}
+                </p>
+              {% endif %}
+
+              <p class="text-muted small mb-0">
+                <i class="bi bi-calendar3 me-1"></i>
+                {{ gallery.created_at|date:"d M Y" }}
+              </p>
+            </div>
+
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+              <a href="{% url 'media_gallery:detail' gallery.pk %}"
+                 class="btn btn-sadac btn-sm w-100">
+                <i class="bi bi-eye me-1"></i>Voir l'album
+              </a>
+            </div>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if is_paginated %}
+        <nav class="mt-5 d-flex justify-content-center">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+              >
+                <a class="page-link"
+                   href="?page={{ page_obj.previous_page_number }}">
+                  <i class="bi bi-chevron-left"></i>
+                </a>
+              </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+              
+                {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+              </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+              >
+                <a class="page-link"
+                   href="?page={{ page_obj.next_page_number }}">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+
+    {% else %}
+    <!-- ===== DONNÉES PAR DÉFAUT ===== -->
+    <div class="text-center py-3 mb-5">
+      <div class="mb-4">
+        <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                     align-items-center justify-content-center"
+              style="width:100px;height:100px;">
+          <i class="bi bi-images text-success" style="font-size:3rem;"></i>
+        </span>
+      </div>
+      <h3 class="fw-bold text-muted">Galerie en cours de construction</h3>
+      <p class="text-muted">
+        Nos photos et vidéos d'activités seront publiées ici très bientôt.
+      </p>
+    </div>
+
+    <!-- Albums par défaut -->
+    <div class="row g-4">
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 gallery-card">
+          <div class="d-flex align-items-center justify-content-center"
+               style="height:220px;
+                      background:linear-gradient(135deg,
+                        var(--sadac-green-dark),
+                        var(--sadac-green));">
+            <i class="bi bi-mortarboard text-white"
+               style="font-size:3.5rem;"></i>
+          </div>
+          <div class="card-body p-4">
+            <span class="badge bg-success mb-2">Formation</span>
+            <h5 class="fw-bold">Formations agricoles</h5>
+            <p class="text-muted small">
+              Photos de nos sessions de formation sur le terrain
+              avec les producteurs et coopératives.
+            </p>
+            <p class="text-muted small">
+              <i class="bi bi-images me-1"></i>Album bientôt disponible
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-4 px-4">
+            <span class="btn btn-sadac btn-sm w-100 disabled">
+              <i class="bi bi-clock me-1"></i>Bientôt disponible
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 gallery-card">
+          <div class="d-flex align-items-center justify-content-center"
+               style="height:220px;
+                      background:rgba(245,127,23,0.15);">
+            <i class="bi bi-binoculars"
+               style="font-size:3.5rem;
+                      color:var(--sadac-orange);"></i>
+          </div>
+          <div class="card-body p-4">
+            <span class="badge bg-warning text-dark mb-2">Terrain</span>
+            <h5 class="fw-bold">Visites de champs</h5>
+            <p class="text-muted small">
+              Galerie photos de nos visites de terrain dans les
+              zones agricoles du Mali.
+            </p>
+            <p class="text-muted small">
+              <i class="bi bi-images me-1"></i>Album bientôt disponible
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-4 px-4">
+            <span class="btn btn-sadac btn-sm w-100 disabled">
+              <i class="bi bi-clock me-1"></i>Bientôt disponible
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 gallery-card">
+          <div class="d-flex align-items-center justify-content-center
+                      bg-success bg-opacity-10" style="height:220px;">
+            <i class="bi bi-people text-success"
+               style="font-size:3.5rem;"></i>
+          </div>
+          <div class="card-body p-4">
+            <span class="badge bg-success mb-2">Événements</span>
+            <h5 class="fw-bold">Nos événements</h5>
+            <p class="text-muted small">
+              Retrouvez les photos et vidéos de nos ateliers,
+              conférences et rencontres professionnelles.
+            </p>
+            <p class="text-muted small">
+              <i class="bi bi-images me-1"></i>Album bientôt disponible
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-4 px-4">
+            <span class="btn btn-sadac btn-sm w-100 disabled">
+              <i class="bi bi-clock me-1"></i>Bientôt disponible
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Suivez nos activités</h2>
+    <p class="lead opacity-75 mb-4">
+      Inscrivez-vous à notre newsletter pour recevoir
+      nos dernières photos et vidéos.
+    </p>
+    <form method="post" action="{% url 'newsletter:subscribe' %}"
+          class="d-flex gap-2 justify-content-center flex-wrap">
+      {% csrf_token %}
+      <input type="email" name="email"
+             class="form-control w-auto"
+             style="min-width:280px;"
+             placeholder="Votre adresse email"
+             required/>
+      <button class="btn btn-warning fw-bold px-4" type="submit">
+        <i class="bi bi-send me-1"></i>S'inscrire
+      </button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .gallery-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .gallery-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+  }
+  .gallery-card:hover .gallery-thumb {
+    transform: scale(1.05);
+  }
+</style>
+{% endblock %}

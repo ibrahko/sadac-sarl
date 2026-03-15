@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Commander {{ product.title }} – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <h1 class="fw-bold display-6">
+      Commander / Demander un devis
+    </h1>
+    <p class="lead opacity-75 mt-2">{{ product.title }}</p>
+    <nav aria-label="breadcrumb"
+         class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        <li>
+          <a href="{% url 'core:home' %}"
+             class="text-warning">Accueil</a>
+        </li>
+        <li>
+          <a href="{% url 'products:list' %}"
+             class="text-warning">Produits</a>
+        </li>
+        <li>
+          <a href="{% url 'products:detail' product.slug %}"
+             class="text-warning">
+            {{ product.title|truncatewords:4 }}
+          </a>
+        </li>
+        <li>
+          Commander
+        </li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== FORMULAIRE + RÉCAP ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+
+      <!-- ===== FORMULAIRE ===== -->
+      <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header"
+               style="background:linear-gradient(135deg,
+                        var(--sadac-green-dark),
+                        var(--sadac-green));">
+            <h5 class="text-white fw-bold mb-0">
+              <i class="bi bi-cart-plus me-2"></i>
+              Votre demande de commande
+            </h5>
+          </div>
+          <div class="card-body p-4 p-lg-5">
+
+            <p class="text-muted mb-4">
+              Remplissez ce formulaire et notre équipe vous
+              contactera dans les plus brefs délais pour
+              confirmer votre commande.
+            </p>
+
+            <form method="post"
+                  action="{% url 'orders:order_product' product.slug %}">
+              {% csrf_token %}
+              <div class="row g-3">
+
+                <!-- Nom -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">
+                    <i class="bi bi-person me-1 text-success"></i>
+                    Nom complet
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" name="full_name"
+                         class="form-control"
+                         placeholder="Votre nom et prénom"
+                         required/>
+                </div>
+
+                <!-- Téléphone -->
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">
+                    <i class="bi bi-telephone me-1 text-success"></i>
+                    Téléphone
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input type="tel" name="phone"
+                         class="form-control"
+                         placeholder="+223 XX XX XX XX"
+                         required/>
+                </div>
+
+                <!-- Email -->
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">
+                    <i class="bi bi-envelope me-1 text-success"></i>
+                    Email
+                    <span class="text-muted fw-normal">
+                      (optionnel)
+                    </span>
+                  </label>
+                  <input type="email" name="email"
+                         class="form-control"
+                         placeholder="votre@email.com"/>
+                  <div class="form-text">
+                    Un email de confirmation vous sera envoyé
+                    si vous renseignez votre adresse.
+                  </div>
+                </div>
+
+                <!-- Quantité -->
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold small">
+                    <i class="bi bi-123 me-1 text-success"></i>
+                    Quantité
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" name="quantity"
+                         class="form-control"
+                         value="1" min="1" required/>
+                </div>
+
+                <!-- Message -->
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">
+                    <i class="bi bi-chat-left-text me-1
+                       text-success"></i>
+                    Message / Précisions
+                    <span class="text-muted fw-normal">
+                      (optionnel)
+                    </span>
+                  </label>
+                  <textarea name="message"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Précisez votre demande : variété souhaitée, lieu de livraison, délai, etc."></textarea>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="subscribe_newsletter"
+                           id="newsletterCheck"/>
+                    <label class="form-check-label text-muted small"
+                           for="newsletterCheck">
+                      Je souhaite recevoir les actualités
+                      et offres de SADAC par email
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Bouton -->
+                <div class="col-12 pt-2">
+                  <button type="submit"
+                          class="btn btn-sadac btn-lg w-100">
+                    <i class="bi bi-send me-2"></i>
+                    Envoyer ma demande de commande
+                  </button>
+                </div>
+
+                <!-- Mention -->
+                <div class="col-12">
+                  <p class="text-muted small text-center mb-0">
+                    <i class="bi bi-shield-check text-success me-1"></i>
+                    Vos informations sont confidentielles et
+                    ne seront jamais partagées.
+                  </p>
+                </div>
+
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== RÉCAP PRODUIT ===== -->
+      <div class="col-lg-5">
+
+        <!-- Carte produit -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-top:4px solid
+                    var(--sadac-orange) !important;">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">
+              <i class="bi bi-box-seam text-success me-2"></i>
+              Produit sélectionné
+            </h6>
+
+            {% if product.image %}
+              <img src="{{ product.image.url }}"
+                   alt="{{ product.title }}"
+                   class="img-fluid rounded-3 mb-3 w-100"
+                   style="height:180px; object-fit:cover;"/>
+            {% else %}
+              <div class="rounded-3 bg-success bg-opacity-10
+                          d-flex align-items-center
+                          justify-content-center mb-3"
+                   style="height:180px;">
+                <i class="bi bi-box-seam text-success"
+                   style="font-size:3rem;"></i>
+              </div>
+            {% endif %}
+
+            {% if product.category %}
+              <span class="badge bg-success mb-2">
+                {{ product.category.name }}
+              </span>
+            {% endif %}
+
+            <h5 class="fw-bold mb-2">{{ product.title }}</h5>
+
+            <p class="text-muted small mb-3">
+              {{ product.description|truncatewords:25 }}
+            </p>
+
+            {% if product.price_info %}
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-tag"
+                   style="color:var(--sadac-orange);"></i>
+                <span class="fw-bold"
+                      style="color:var(--sadac-orange);">
+                  {{ product.price_info }}
+                </span>
+              </div>
+            {% endif %}
+
+            <hr/>
+
+            <a href="{% url 'products:detail' product.slug %}"
+               class="btn btn-outline-success btn-sm w-100">
+              <i class="bi bi-arrow-left me-1"></i>
+              Retour au produit
+            </a>
+          </div>
+        </div>
+
+        <!-- Comment ça marche -->
+        <div class="card border-0 shadow-sm mb-4 p-4">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-info-circle text-success me-2"></i>
+            Comment ça marche ?
+          </h6>
+          <ul class="list-unstyled mb-0">
+            <li>
+              <div class="rounded-circle bg-success text-white
+                          d-flex align-items-center
+                          justify-content-center fw-bold
+                          flex-shrink-0"
+                   style="width:30px;height:30px;
+                          font-size:0.8rem;">
+                1
+              </div>
+              <p class="text-muted small mb-0 mt-1">
+                Vous remplissez le formulaire
+                et envoyez votre demande.
+              </p>
+            </li>
+            <li>
+              <div class="rounded-circle bg-success text-white
+                          d-flex align-items-center
+                          justify-content-center fw-bold
+                          flex-shrink-0"
+                   style="width:30px;height:30px;
+                          font-size:0.8rem;">
+                2
+              </div>
+              <p class="text-muted small mb-0 mt-1">
+                Notre équipe reçoit votre demande
+                et vous contacte sous 24h.
+              </p>
+            </li>
+            <li>
+              <div class="rounded-circle bg-success text-white
+                          d-flex align-items-center
+                          justify-content-center fw-bold
+                          flex-shrink-0"
+                   style="width:30px;height:30px;
+                          font-size:0.8rem;">
+                3
+              </div>
+              <p class="text-muted small mb-0 mt-1">
+                Nous convenons ensemble des modalités
+                de livraison et de paiement.
+              </p>
+            </li>
+            <li>
+              <div class="rounded-circle bg-warning text-dark
+                          d-flex align-items-center
+                          justify-content-center fw-bold
+                          flex-shrink-0"
+                   style="width:30px;height:30px;
+                          font-size:0.8rem;">
+                4
+              </div>
+              <p class="text-muted small mb-0 mt-1">
+                Votre commande est livrée.
+              </p>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contact direct -->
+        <div class="card border-0 shadow-sm p-4">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-headset text-success me-2"></i>
+            Préférez-vous nous appeler ?
+          </h6>
+          <div class="d-flex flex-column gap-2">
+            {% if site_settings and site_settings.phone1 %}
+              <a href="tel:{{ site_settings.phone1 }}"
+                 class="btn btn-outline-success btn-sm">
+                <i class="bi bi-telephone me-2"></i>
+                {{ site_settings.phone1 }}
+              </a>
+            {% endif %}
+            {% if site_settings and site_settings.whatsapp %}
+              <a href="https://wa.me/{{ site_settings.whatsapp }}?text=Bonjour, je souhaite commander : {{ product.title }}"
+                 target="_blank"
+                 class="btn btn-success btn-sm">
+                <i class="bi bi-whatsapp me-2"></i>
+                Commander via WhatsApp
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">
+      Découvrez aussi nos autres produits
+    </h2>
+    <p class="lead opacity-75 mb-4">
+      SADAC propose une gamme complète de produits
+      agricoles et d'intrants de qualité.
+    </p>
+    <a href="{% url 'products:list' %}"
+       class="btn btn-warning btn-lg px-5 fw-bold">
+      <i class="bi bi-grid me-2"></i>
+      Voir tous les produits
+    </a>
+  </div>
+</section>
+
+{% endblock %}

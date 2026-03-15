@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nos Produits – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <h1 class="fw-bold display-5">Nos Produits</h1>
+    <p class="lead opacity-75 mt-2">
+      Des produits agricoles de qualité, directement du producteur
+    </p>
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        <li>
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        <li>Produits</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== FILTRES PAR CATÉGORIE ===== -->
+<section class="py-4 bg-light border-bottom">
+  <div class="container">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <span class="fw-semibold text-muted me-2">
+        <i class="bi bi-funnel me-1"></i>Filtrer :
+      </span>
+      <a href="{% url 'products:list' %}"
+         class="btn btn-sm {% if not current_category %}btn-success{% else %}btn-outline-success{% endif %} rounded-pill px-3">
+        Tous
+      </a>
+      {% for cat in categories %}
+        <a href="{% url 'products:list' %}?categorie={{ cat.slug }}"
+           class="btn btn-sm {% if current_category == cat.slug %}btn-success{% else %}btn-outline-success{% endif %} rounded-pill px-3">
+          {{ cat.name }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== LISTE PRODUITS ===== -->
+<section class="py-5">
+  <div class="container">
+
+    {% if products %}
+
+      <!-- Compteur résultats -->
+      <p class="text-muted mb-4">
+        <i class="bi bi-grid me-1"></i>
+        <strong>{{ page_obj.paginator.count }}</strong> produit(s) trouvé(s)
+        {% if current_category %}
+          dans la catégorie <strong>{{ current_category }}</strong>
+        {% endif %}
+      </p>
+
+      <div class="row g-4">
+        {% for product in products %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card card-product h-100 shadow-sm border-0">
+
+            <!-- Image -->
+            {% if product.image %}
+              <div class="position-relative overflow-hidden"
+                   style="height:220px;">
+                <img src="{{ product.image.url }}"
+                     alt="{{ product.title }}"
+                     class="w-100 h-100"
+                     style="object-fit:cover;
+                            transition: transform 0.3s;"
+                     onmouseover="this.style.transform='scale(1.05)'"
+                     onmouseout="this.style.transform='scale(1)'"/>
+                {% if product.category %}
+                  <span class="position-absolute top-0 start-0 m-2
+                               badge bg-success">
+                    {{ product.category.name }}
+                  </span>
+                {% endif %}
+              </div>
+            {% else %}
+              <div class="position-relative d-flex align-items-center
+                          justify-content-center bg-light"
+                   style="height:220px;">
+                <i class="bi bi-box-seam text-muted" style="font-size:4rem;"></i>
+                {% if product.category %}
+                  <span class="position-absolute top-0 start-0 m-2
+                               badge bg-success">
+                    {{ product.category.name }}
+                  </span>
+                {% endif %}
+              </div>
+            {% endif %}
+
+            <!-- Contenu -->
+            <div class="card-body p-4">
+              <h5 class="fw-bold mb-2">{{ product.title }}</h5>
+              <p class="text-muted small mb-3">
+                {{ product.description|truncatewords:20 }}
+              </p>
+              {% if product.price_info %}
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <i class="bi bi-tag text-warning"></i>
+                  <span class="fw-bold" style="color:var(--sadac-orange);">
+                    {{ product.price_info }}
+                  </span>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+              <div class="d-flex gap-2">
+                <a href="{% url 'products:detail' product.slug %}"
+                   class="btn btn-sadac btn-sm flex-grow-1">
+                  <i class="bi bi-eye me-1"></i>Détails
+                </a>
+                <a href="{% url 'orders:order_product' product.slug %}"
+                   class="btn btn-accent btn-sm flex-grow-1">
+                  <i class="bi bi-cart-plus me-1"></i>Commander
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- ===== PAGINATION ===== -->
+      {% if page_obj.has_other_pages %}
+        <nav class="mt-5 d-flex justify-content-center">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+              >
+                <a class="page-link"
+                   href="?page={{ page_obj.previous_page_number }}
+                         {% if current_category %}&categorie={{ current_category }}{% endif %}">
+                  <i class="bi bi-chevron-left"></i>
+                </a>
+              </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              >
+                <a class="page-link"
+                   href="?page={{ num }}
+                         {% if current_category %}&categorie={{ current_category }}{% endif %}">
+                  {{ num }}
+                </a>
+              </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              >
+                <a class="page-link"
+                   href="?page={{ page_obj.next_page_number }}
+                         {% if current_category %}&categorie={{ current_category }}{% endif %}">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+
+    {% else %}
+    <!-- ===== AUCUN PRODUIT / DONNÉES PAR DÉFAUT ===== -->
+    <div class="text-center py-5">
+      <div class="mb-4">
+        <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                     align-items-center justify-content-center"
+              style="width:100px;height:100px;">
+          <i class="bi bi-box-seam text-success" style="font-size:3rem;"></i>
+        </span>
+      </div>
+      <h3 class="fw-bold text-muted">Catalogue en cours de préparation</h3>
+      <p class="text-muted mb-4">
+        Nos produits seront bientôt disponibles. <br/>
+        En attendant, contactez-nous directement pour vos besoins.
+      </p>
+
+      <!-- Produits par défaut visuels -->
+      <div class="row g-4 mt-3 text-start">
+
+        <div class="col-lg-4 col-md-6">
+          <div class="card card-product border-0 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-center bg-success
+                        bg-opacity-10" style="height:220px;">
+              <i class="bi bi-tree text-success" style="font-size:4rem;"></i>
+            </div>
+            <div class="card-body p-4">
+              <span class="badge bg-success mb-2">Maraîchage</span>
+              <h5 class="fw-bold">Légumes frais</h5>
+              <p class="text-muted small">
+                Tomates, oignons, choux et autres légumes de saison produits
+                localement avec des méthodes respectueuses.
+              </p>
+              <p class="fw-bold" style="color:var(--sadac-orange);">
+                <i class="bi bi-tag me-1"></i>Sur demande
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+              <a href="{% url 'core:contact' %}"
+                 class="btn btn-sadac btn-sm w-100">
+                <i class="bi bi-envelope me-1"></i>Demander un devis
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="card card-product border-0 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-center"
+                 style="height:220px;
+                        background:rgba(245,127,23,0.1);">
+              <i class="bi bi-basket" style="font-size:4rem;
+                                             color:var(--sadac-orange);"></i>
+            </div>
+            <div class="card-body p-4">
+              <span class="badge bg-warning text-dark mb-2">Céréales</span>
+              <h5 class="fw-bold">Céréales locales</h5>
+              <p class="text-muted small">
+                Mil, sorgho, maïs et riz produits par nos coopératives
+                partenaires dans les zones agricoles du Mali.
+              </p>
+              <p class="fw-bold" style="color:var(--sadac-orange);">
+                <i class="bi bi-tag me-1"></i>Sur demande
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+              <a href="{% url 'core:contact' %}"
+                 class="btn btn-sadac btn-sm w-100">
+                <i class="bi bi-envelope me-1"></i>Demander un devis
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="card card-product border-0 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-center
+                        bg-success bg-opacity-10" style="height:220px;">
+              <i class="bi bi-droplet text-success" style="font-size:4rem;"></i>
+            </div>
+            <div class="card-body p-4">
+              <span class="badge bg-success mb-2">Intrants</span>
+              <h5 class="fw-bold">Intrants agricoles</h5>
+              <p class="text-muted small">
+                Semences améliorées, engrais et produits phytosanitaires
+                sélectionnés pour maximiser les rendements agricoles.
+              </p>
+              <p class="fw-bold" style="color:var(--sadac-orange);">
+                <i class="bi bi-tag me-1"></i>Sur demande
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+              <a href="{% url 'core:contact' %}"
+                 class="btn btn-sadac btn-sm w-100">
+                <i class="bi bi-envelope me-1"></i>Demander un devis
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-5">
+        <a href="{% url 'core:contact' %}"
+           class="btn btn-sadac btn-lg px-5">
+          <i class="bi bi-envelope me-2"></i>Contactez-nous pour vos besoins
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Vous cherchez un produit spécifique ?</h2>
+    <p class="lead opacity-75 mb-4">
+      Contactez-nous et nous trouverons ensemble la meilleure solution.
+    </p>
+    <a href="{% url 'core:contact' %}"
+       class="btn btn-warning btn-lg px-5 fw-bold">
+      <i class="bi bi-envelope me-2"></i>Nous contacter
+    </a>
+  </div>
+</section>
+
+{% endblock %}

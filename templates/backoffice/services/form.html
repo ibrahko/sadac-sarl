@@ -1,0 +1,320 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}{{ title }} – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>
+    <a href="{% url 'backoffice:service_list' %}">Services</a>
+  </li>
+  >{{ title }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-grid me-2"></i>{{ title }}</h4>
+    <p class="text-muted small mb-0">
+      Remplissez les informations du service
+    </p>
+  </div>
+  <a href="{% url 'backoffice:service_list' %}"
+     class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+<div class="row g-4">
+
+  <!-- Formulaire principal -->
+  <div class="col-lg-8">
+    <div class="card bo-form-card">
+      <div class="card-header">
+        <h6 class="mb-0 fw-bold">
+          <i class="bi bi-info-circle me-2"></i>
+          Informations du service
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+
+            <!-- Titre -->
+            <div class="col-md-8">
+              <label class="form-label fw-semibold small">
+                Titre <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="title"
+                     value="{{ form.title.value|default:'' }}"
+                     class="form-control"
+                     placeholder="Ex: Conseil Agricole"
+                     required/>
+            </div>
+
+            <!-- Ordre -->
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small">
+                Ordre d'affichage
+              </label>
+              <input type="number" name="order"
+                     value="{{ form.order.value|default:'0' }}"
+                     class="form-control"
+                     min="0"/>
+            </div>
+
+            <!-- Résumé -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Résumé court <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="short_description"
+                     value="{{ form.short_description.value|default:'' }}"
+                     class="form-control"
+                     placeholder="Phrase courte de présentation"
+                     required/>
+              <div class="form-text">
+                Affiché sur la page d'accueil et la liste des services.
+              </div>
+            </div>
+
+            <!-- Description complète -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Description complète <span class="text-danger">*</span>
+              </label>
+              <textarea name="description"
+                        class="form-control"
+                        rows="8"
+                        placeholder="Description détaillée du service..."
+                        required>{{ form.description.value|default:'' }}</textarea>
+            </div>
+
+            <!-- Icône -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Icône Bootstrap Icons
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i id="iconPreview"
+                     class="bi bi-{{ form.icon.value|default:'patch-check' }}"></i>
+                </span>
+                <input type="text" name="icon"
+                       id="iconInput"
+                       value="{{ form.icon.value|default:'' }}"
+                       class="form-control"
+                       placeholder="Ex: lightbulb, tree, people"/>
+              </div>
+              <div class="form-text">
+                Noms d'icônes disponibles sur
+                <a href="https://icons.getbootstrap.com"
+                   target="_blank" class="text-success">
+                  icons.getbootstrap.com
+                </a>
+              </div>
+            </div>
+
+            <!-- Statut -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Statut
+              </label>
+              <select name="is_active" class="form-select">
+                <option value="True"
+                  {% if form.is_active.value %}selected{% endif %}>
+                  Actif (visible sur le site)
+                </option>
+                <option value="False"
+                  {% if not form.is_active.value %}selected{% endif %}>
+                  Inactif (masqué)
+                </option>
+              </select>
+            </div>
+
+            <!-- Image -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Image illustrative
+              </label>
+              {% if form.instance.image %}
+                <div class="mb-2">
+                  <img src="{{ form.instance.image.url }}"
+                       alt="Image actuelle"
+                       class="bo-img-preview-lg"/>
+                  <p class="text-muted small">Image actuelle</p>
+                </div>
+              {% endif %}
+              <input type="file" name="image"
+                     class="form-control"
+                     accept="image/*"/>
+              <div class="form-text">
+                Formats : JPG, PNG, WEBP. Taille max : 2 Mo.
+              </div>
+            </div>
+
+            <!-- Bouton -->
+            <div class="col-12 pt-2">
+              <button type="submit" class="btn btn-bo-primary px-5">
+                <i class="bi bi-check-lg me-2"></i>{{ btn_label }}
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm p-4">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-lightbulb text-warning me-2"></i>
+        Conseils
+      </h6>
+      <ul class="list-unstyled text-muted small mb-3">
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Utilisez un titre court et clair.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Le résumé s'affiche sur la page d'accueil.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          L'ordre détermine la position (0 = premier).
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Cliquez sur une icône ci-dessous pour la sélectionner.
+        </li>
+      </ul>
+
+      <hr/>
+
+      <!-- Icônes suggérées statiques -->
+      <p class="small fw-semibold mb-2">
+        <i class="bi bi-grid me-1"></i>Icônes suggérées :
+      </p>
+      <div class="d-flex flex-wrap gap-2">
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="lightbulb"
+                onclick="setIcon('lightbulb')">
+          <i class="bi bi-lightbulb"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="mortarboard"
+                onclick="setIcon('mortarboard')">
+          <i class="bi bi-mortarboard"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="bar-chart-line"
+                onclick="setIcon('bar-chart-line')">
+          <i class="bi bi-bar-chart-line"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="tree"
+                onclick="setIcon('tree')">
+          <i class="bi bi-tree"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="shop"
+                onclick="setIcon('shop')">
+          <i class="bi bi-shop"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="people"
+                onclick="setIcon('people')">
+          <i class="bi bi-people"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="gear"
+                onclick="setIcon('gear')">
+          <i class="bi bi-gear"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="clipboard-check"
+                onclick="setIcon('clipboard-check')">
+          <i class="bi bi-clipboard-check"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="patch-check"
+                onclick="setIcon('patch-check')">
+          <i class="bi bi-patch-check"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="briefcase"
+                onclick="setIcon('briefcase')">
+          <i class="bi bi-briefcase"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="award"
+                onclick="setIcon('award')">
+          <i class="bi bi-award"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="tools"
+                onclick="setIcon('tools')">
+          <i class="bi bi-tools"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="droplet"
+                onclick="setIcon('droplet')">
+          <i class="bi bi-droplet"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="sun"
+                onclick="setIcon('sun')">
+          <i class="bi bi-sun"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="globe"
+                onclick="setIcon('globe')">
+          <i class="bi bi-globe"></i>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-outline-success"
+                title="shield-check"
+                onclick="setIcon('shield-check')">
+          <i class="bi bi-shield-check"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Aperçu icône en temps réel
+  document.getElementById('iconInput')
+    .addEventListener('input', function () {
+      document.getElementById('iconPreview').className =
+        'bi bi-' + (this.value || 'patch-check');
+    });
+
+  // Clic sur icône suggérée
+  function setIcon(name) {
+    document.getElementById('iconInput').value = name;
+    document.getElementById('iconPreview').className =
+      'bi bi-' + name;
+  }
+</script>
+{% endblock %}

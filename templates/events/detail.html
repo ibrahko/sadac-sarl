@@ -1,0 +1,503 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.title }} – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+
+    {% if event.status == 'upcoming' %}
+      <span class="badge bg-warning text-dark mb-3 px-3 py-2">
+        <i class="bi bi-clock me-1"></i>À venir
+      </span>
+    {% elif event.status == 'past' %}
+      <span class="badge bg-secondary mb-3 px-3 py-2">
+        <i class="bi bi-check-circle me-1"></i>Passé
+      </span>
+    {% else %}
+      <span class="badge bg-danger mb-3 px-3 py-2">
+        <i class="bi bi-x-circle me-1"></i>Annulé
+      </span>
+    {% endif %}
+
+    <h1 class="fw-bold display-6">{{ event.title }}</h1>
+
+    <div class="d-flex align-items-center
+                justify-content-center gap-4 mt-3 flex-wrap">
+      <span class="text-white opacity-75 small">
+        <i class="bi bi-calendar3 me-1"></i>
+        {{ event.start_date|date:"d M Y" }}
+        {% if event.end_date %}
+          → {{ event.end_date|date:"d M Y" }}
+        {% endif %}
+      </span>
+      <span class="text-white opacity-75 small">
+        <i class="bi bi-geo-alt me-1"></i>
+        {{ event.location }}
+      </span>
+    </div>
+
+    <nav aria-label="breadcrumb"
+         class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        <li>
+          <a href="{% url 'core:home' %}"
+             class="text-warning">Accueil</a>
+        </li>
+        <li>
+          <a href="{% url 'events:list' %}"
+             class="text-warning">Événements</a>
+        </li>
+        <li>
+          {{ event.title|truncatewords:5 }}
+        </li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== CONTENU ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+
+      <!-- ===== CONTENU PRINCIPAL ===== -->
+      <div class="col-lg-8">
+
+        <!-- Affiche -->
+        {% if event.banner %}
+          <img src="{{ event.banner.url }}"
+               alt="{{ event.title }}"
+               class="img-fluid rounded-3 shadow-sm w-100 mb-4"
+               style="max-height:450px; object-fit:cover;"/>
+        {% endif %}
+
+        <!-- Description -->
+        <h3 class="fw-bold mb-3">
+          {% if event.status == 'past' %}
+            Compte rendu de l'événement
+          {% else %}
+            À propos de cet événement
+          {% endif %}
+        </h3>
+        <div class="divider-orange mb-4"></div>
+        <div class="text-muted lh-lg mb-5">
+          {{ event.description|linebreaks }}
+        </div>
+
+        <!-- ===== GALERIES ===== -->
+        {% if galleries %}
+          <h4 class="fw-bold mb-4">
+            <i class="bi bi-images text-success me-2"></i>
+            Photos & Vidéos de l'événement
+          </h4>
+
+          {% for gallery in galleries %}
+          <div class="mb-5">
+
+            {% if gallery.title %}
+              <h5 class="fw-semibold mb-3">
+                <i class="bi bi-collection
+                   text-success me-2"></i>
+                {{ gallery.title }}
+              </h5>
+            {% endif %}
+
+            {% with medias=gallery.medias.all %}
+            {% if medias %}
+
+              <!-- Photos -->
+              <div class="row g-3 mb-4">
+                {% for media in medias %}
+                  {% if media.type == 'image' and media.file %}
+                  <div class="col-lg-4 col-md-4 col-6">
+                    <div class="card border-0 shadow-sm
+                                overflow-hidden"
+                         style="cursor:pointer;">
+                      <img src="{{ media.file.url }}"
+                           alt="{{ media.caption|default:event.title }}"
+                           class="w-100"
+                           style="height:180px;
+                                  object-fit:cover;
+                                  transition:transform 0.3s;"
+                           onmouseover="this.style.transform='scale(1.05)'"
+                           onmouseout="this.style.transform='scale(1)'"
+                           onclick="openLightbox('{{ media.file.url }}', '{{ media.caption|default:'' }}')"/>
+                      {% if media.caption %}
+                        <div class="p-2">
+                          <p class="text-muted small mb-0">
+                            {{ media.caption }}
+                          </p>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              <!-- Vidéos -->
+              {% for media in medias %}
+                {% if media.type == 'video' and media.url %}
+                <div class="mb-4">
+                  {% if media.caption %}
+                    <p class="fw-semibold small mb-2">
+                      <i class="bi bi-play-circle
+                         text-primary me-1"></i>
+                      {{ media.caption }}
+                    </p>
+                  {% endif %}
+                  <div class="ratio ratio-16x9 rounded-3
+                              overflow-hidden shadow-sm">
+                    {% if 'youtu.be' in media.url %}
+                      <iframe
+                        src="https://www.youtube.com/embed/{{ media.url|slice:'-11:' }}"
+                        allowfullscreen
+                        loading="lazy"></iframe>
+                    {% elif 'youtube.com' in media.url %}
+                      <iframe
+                        src="https://www.youtube.com/embed/{{ media.url|slice:'32:' }}"
+                        allowfullscreen
+                        loading="lazy"></iframe>
+                    {% elif 'facebook.com' in media.url %}
+                      <iframe
+                        src="https://www.facebook.com/plugins/video.php?href={{ media.url|urlencode }}"
+                        allowfullscreen
+                        loading="lazy"></iframe>
+                    {% else %}
+                      <div class="d-flex align-items-center
+                                  justify-content-center bg-dark">
+                        <a href="{{ media.url }}"
+                           target="_blank"
+                           class="text-white text-center
+                                  text-decoration-none p-4">
+                          <i class="bi bi-play-circle"
+                             style="font-size:3rem;"></i>
+                          <p class="mt-2 small mb-0">
+                            Voir la vidéo
+                          </p>
+                        </a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+
+            {% endif %}
+            {% endwith %}
+          </div>
+          {% endfor %}
+
+        {% elif event.status == 'past' %}
+          <!-- Pas encore de galerie -->
+          <div class="alert alert-info d-flex gap-3 align-items-start">
+            <i class="bi bi-images fs-4 flex-shrink-0"></i>
+            <div>
+              <p class="fw-semibold mb-0">
+                Photos bientôt disponibles
+              </p>
+              <p class="small mb-0 opacity-75">
+                Les photos et vidéos de cet événement
+                seront publiées très prochainement.
+              </p>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Partage -->
+        <div class="mt-5 pt-4 border-top">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-share text-success me-2"></i>
+            Partager cet événement
+          </h6>
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+               target="_blank"
+               class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-facebook me-1"></i>Facebook
+            </a>
+            <a href="https://wa.me/?text={{ event.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}"
+               target="_blank"
+               class="btn btn-sm btn-success">
+              <i class="bi bi-whatsapp me-1"></i>WhatsApp
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== SIDEBAR ===== -->
+      <div class="col-lg-4">
+
+        <!-- Infos événement -->
+        <div class="card border-0 shadow-sm mb-4"
+             style="border-top:4px solid
+                    var(--sadac-green) !important;">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">
+              <i class="bi bi-info-circle
+                 text-success me-2"></i>
+              Informations
+            </h6>
+            <ul class="list-unstyled mb-0">
+              <li>
+                <i class="bi bi-calendar3 text-success
+                   fs-5 flex-shrink-0"></i>
+                <div>
+                  <p class="text-muted small mb-0">
+                    Date de début
+                  </p>
+                  <p class="fw-semibold mb-0 small">
+                    {{ event.start_date|date:"d M Y à H:i" }}
+                  </p>
+                </div>
+              </li>
+              {% if event.end_date %}
+              <li>
+                <i class="bi bi-calendar-check text-success
+                   fs-5 flex-shrink-0"></i>
+                <div>
+                  <p class="text-muted small mb-0">
+                    Date de fin
+                  </p>
+                  <p class="fw-semibold mb-0 small">
+                    {{ event.end_date|date:"d M Y à H:i" }}
+                  </p>
+                </div>
+              </li>
+              {% endif %}
+              <li>
+                <i class="bi bi-geo-alt text-success
+                   fs-5 flex-shrink-0"></i>
+                <div>
+                  <p class="text-muted small mb-0">Lieu</p>
+                  <p class="fw-semibold mb-0 small">
+                    {{ event.location }}
+                  </p>
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-flag text-success
+                   fs-5 flex-shrink-0"></i>
+                <div>
+                  <p class="text-muted small mb-0">Statut</p>
+                  <p class="fw-semibold mb-0 small">
+                    {{ event.get_status_display }}
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- CTA si à venir -->
+        {% if event.status == 'upcoming' %}
+        <div class="card border-0 shadow-sm mb-4 p-4"
+             style="background:linear-gradient(135deg,
+                      var(--sadac-green-dark),
+                      var(--sadac-green));">
+          <h6 class="fw-bold text-white mb-2">
+            <i class="bi bi-person-plus me-2"></i>
+            Participer à cet événement
+          </h6>
+          <p class="text-white opacity-75 small mb-3">
+            Contactez-nous pour vous inscrire ou
+            obtenir plus d'informations.
+          </p>
+          <div class="d-flex flex-column gap-2">
+            <a href="{% url 'core:contact' %}"
+               class="btn btn-warning btn-sm fw-bold">
+              <i class="bi bi-envelope me-1"></i>
+              Nous contacter
+            </a>
+            {% if site_settings and site_settings.whatsapp %}
+              <a href="https://wa.me/{{ site_settings.whatsapp }}?text=Bonjour, je suis intéressé par : {{ event.title }}"
+                 target="_blank"
+                 class="btn btn-light btn-sm">
+                <i class="bi bi-whatsapp me-1"></i>
+                WhatsApp
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Newsletter -->
+        <div class="card border-0 shadow-sm mb-4 p-4">
+          <h6 class="fw-bold mb-2">
+            <i class="bi bi-bell text-success me-2"></i>
+            Ne manquez rien
+          </h6>
+          <p class="text-muted small mb-3">
+            Inscrivez-vous pour être informé de
+            nos prochains événements.
+          </p>
+          <form method="post"
+                action="{% url 'newsletter:subscribe' %}">
+            {% csrf_token %}
+            <div class="input-group input-group-sm">
+              <input type="email" name="email"
+                     class="form-control"
+                     placeholder="Votre email"
+                     required/>
+              <button class="btn btn-sadac" type="submit">
+                <i class="bi bi-send"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Autres événements -->
+        {% if other_events %}
+        <div class="card border-0 shadow-sm p-4">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-calendar-event
+               text-success me-2"></i>
+            Autres événements
+          </h6>
+          {% for ev in other_events %}
+          <div class="d-flex gap-3
+                      {% if not forloop.last %}
+                        mb-3 pb-3 border-bottom
+                      {% endif %}">
+            <div class="text-center rounded p-2 flex-shrink-0"
+                 style="background:rgba(46,125,50,0.1);
+                        min-width:46px;">
+              <div class="fw-bold text-success small">
+                {{ ev.start_date|date:"d" }}
+              </div>
+              <div class="text-muted"
+                   style="font-size:0.65rem;">
+                {{ ev.start_date|date:"M" }}
+              </div>
+            </div>
+            <div class="flex-grow-1">
+              <a href="{% url 'events:detail' ev.slug %}"
+                 class="text-dark text-decoration-none">
+                <p class="fw-semibold small mb-0">
+                  {{ ev.title|truncatewords:6 }}
+                </p>
+                <p class="text-muted small mb-0">
+                  <i class="bi bi-geo-alt me-1"></i>
+                  {{ ev.location }}
+                </p>
+              </a>
+            </div>
+            {% if ev.status == 'upcoming' %}
+              <span class="badge bg-success
+                           align-self-center flex-shrink-0"
+                    style="font-size:0.6rem;">
+                À venir
+              </span>
+            {% endif %}
+          </div>
+          {% endfor %}
+
+          <a href="{% url 'events:list' %}"
+             class="btn btn-outline-success btn-sm
+                    w-100 mt-3">
+            Voir tous les événements
+          </a>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LIGHTBOX MODAL ===== -->
+<div class="modal fade" id="lightboxModal" tabindex="-1">
+  <div class="modal-dialog modal-xl
+              modal-dialog-centered">
+    <div class="modal-content bg-dark border-0">
+      <div class="modal-header border-0 pb-0">
+        <button type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center p-2 p-lg-4">
+        <img id="lightboxImg"
+             src="" alt=""
+             class="img-fluid rounded-3"
+             style="max-height:80vh;
+                    object-fit:contain;"/>
+        <p id="lightboxCaption"
+           class="text-white-50 small mt-3 mb-0"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    {% if event.status == 'upcoming' %}
+      <h2 class="fw-bold mb-3">
+        Rejoignez-nous à cet événement !
+      </h2>
+      <p class="lead opacity-75 mb-4">
+        Inscrivez-vous dès maintenant et faites
+        partie de l'aventure SADAC.
+      </p>
+      <div class="d-flex gap-3 justify-content-center
+                  flex-wrap">
+        <a href="{% url 'core:contact' %}"
+           class="btn btn-warning btn-lg px-5 fw-bold">
+          <i class="bi bi-envelope me-2"></i>
+          S'inscrire / Nous contacter
+        </a>
+        {% if site_settings and site_settings.whatsapp %}
+          <a href="https://wa.me/{{ site_settings.whatsapp }}"
+             target="_blank"
+             class="btn btn-outline-light btn-lg px-5">
+            <i class="bi bi-whatsapp me-2"></i>
+            WhatsApp
+          </a>
+        {% endif %}
+      </div>
+    {% else %}
+      <h2 class="fw-bold mb-3">
+        Découvrez nos prochains événements
+      </h2>
+      <p class="lead opacity-75 mb-4">
+        Restez informés de toutes nos activités
+        et formations à venir.
+      </p>
+      <div class="d-flex gap-3 justify-content-center
+                  flex-wrap">
+        <a href="{% url 'events:list' %}"
+           class="btn btn-warning btn-lg px-5 fw-bold">
+          <i class="bi bi-calendar-event me-2"></i>
+          Voir les événements
+        </a>
+        <a href="{% url 'media_gallery:list' %}"
+           class="btn btn-outline-light btn-lg px-5">
+          <i class="bi bi-images me-2"></i>
+          Voir la galerie
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Lightbox
+  function openLightbox(src, caption) {
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxCaption')
+      .textContent = caption || '';
+    var modal = new bootstrap.Modal(
+      document.getElementById('lightboxModal')
+    );
+    modal.show();
+  }
+</script>
+{% endblock %}

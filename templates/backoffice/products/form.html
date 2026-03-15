@@ -1,0 +1,170 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}{{ title }} – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  >
+    <a href="{% url 'backoffice:product_list' %}">Produits</a>
+  </li>
+  >{{ title }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-box-seam me-2"></i>{{ title }}</h4>
+    <p class="text-muted small mb-0">
+      Remplissez les informations du produit
+    </p>
+  </div>
+  <a href="{% url 'backoffice:product_list' %}"
+     class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card bo-form-card">
+      <div class="card-header">
+        <h6 class="mb-0 fw-bold">
+          <i class="bi bi-info-circle me-2"></i>
+          Informations du produit
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+
+            <div class="col-md-8">
+                <label class="form-label fw-semibold small">
+                Titre <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="title"
+                     value="{{ form.title.value|default:'' }}"
+                     class="form-control"
+                     placeholder="Nom du produit"
+                     required/>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">
+                Catégorie
+              </label>
+              <select name="category" class="form-select">
+                <option value="">-- Choisir --</option>
+                {% for cat in form.fields.category.queryset %}
+                  <option value="{{ cat.pk }}"
+                    {% if form.category.value|stringformat:"s" == cat.pk|stringformat:"s" %}
+                      selected
+                    {% endif %}>
+                    {{ cat.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold small">
+                Description <span class="text-danger">*</span>
+              </label>
+              <textarea name="description"
+                        class="form-control"
+                        rows="5"
+                        placeholder="Description détaillée du produit"
+                        required>{{ form.description.value|default:'' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">
+                Prix / Info tarif
+              </label>
+              <input type="text" name="price_info"
+                     value="{{ form.price_info.value|default:'' }}"
+                     class="form-control"
+                     placeholder="Ex: Sur demande, 5000 FCFA/kg"/>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold small">
+                Statut
+              </label>
+              <select name="is_active" class="form-select">
+                <option value="True"
+                  {% if form.is_active.value %}selected{% endif %}>
+                  Actif (visible sur le site)
+                </option>
+                <option value="False"
+                  {% if not form.is_active.value %}selected{% endif %}>
+                  Inactif (masqué)
+                </option>
+              </select>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold small">
+                Image du produit
+              </label>
+              {% if form.instance.image %}
+                <div class="mb-2">
+                  <img src="{{ form.instance.image.url }}"
+                       alt="Image actuelle"
+                       class="bo-img-preview-lg"/>
+                  <p class="text-muted small">Image actuelle</p>
+                </div>
+              {% endif %}
+              <input type="file" name="image"
+                     class="form-control"
+                     accept="image/*"/>
+              <div class="form-text">
+                Formats acceptés : JPG, PNG, WEBP. Taille max : 2 Mo.
+              </div>
+            </div>
+
+            <div class="col-12 pt-2">
+              <button type="submit" class="btn btn-bo-primary px-5">
+                <i class="bi bi-check-lg me-2"></i>{{ btn_label }}
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar aide -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm p-4">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-lightbulb text-warning me-2"></i>
+        Conseils
+      </h6>
+      <ul class="list-unstyled text-muted small">
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Utilisez un titre court et descriptif.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Ajoutez une image de bonne qualité.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Précisez les informations de prix si disponibles.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Mettez le statut sur "Inactif" pour masquer temporairement.
+        </li>
+      </ul>
+      <hr/>
+      <a href="{% url 'backoffice:category_list' %}"
+         class="btn btn-outline-success btn-sm w-100">
+        <i class="bi bi-tags me-1"></i>Gérer les catégories
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

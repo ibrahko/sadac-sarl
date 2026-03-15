@@ -1,0 +1,200 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}{{ title }} – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>
+    <a href="{% url 'backoffice:event_list' %}">Événements</a>
+  </li>
+  <li>{{ title }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-calendar-event me-2"></i>{{ title }}</h4>
+    <p class="text-muted small mb-0">
+      Remplissez les informations de l'événement
+    </p>
+  </div>
+  <a href="{% url 'backoffice:event_list' %}"
+     class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card bo-form-card">
+      <div class="card-header">
+        <h6 class="mb-0 fw-bold">
+          <i class="bi bi-calendar-plus me-2"></i>
+          Détails de l'événement
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+
+            <!-- Titre -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Titre <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="title"
+                     value="{{ form.title.value|default:'' }}"
+                     class="form-control"
+                     placeholder="Titre de l'événement"
+                     required/>
+            </div>
+
+            <!-- Date début -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Date de début <span class="text-danger">*</span>
+              </label>
+              <input type="datetime-local" name="start_date"
+                     value="{{ form.start_date.value|default:'' }}"
+                     class="form-control"
+                     required/>
+            </div>
+
+            <!-- Date fin -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Date de fin
+              </label>
+              <input type="datetime-local" name="end_date"
+                     value="{{ form.end_date.value|default:'' }}"
+                     class="form-control"/>
+            </div>
+
+            <!-- Lieu -->
+            <div class="col-md-8">
+              <label class="form-label fw-semibold small">
+                Lieu <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="location"
+                     value="{{ form.location.value|default:'' }}"
+                     class="form-control"
+                     placeholder="Ex: Bamako, Mali"
+                     required/>
+            </div>
+
+            <!-- Statut -->
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small">
+                Statut <span class="text-danger">*</span>
+              </label>
+              <select name="status" class="form-select" required>
+                <option value="upcoming"
+                  {% if form.status.value == 'upcoming' %}selected{% endif %}>
+                  À venir
+                </option>
+                <option value="past"
+                  {% if form.status.value == 'past' %}selected{% endif %}>
+                  Passé
+                </option>
+                <option value="cancelled"
+                  {% if form.status.value == 'cancelled' %}selected{% endif %}>
+                  Annulé
+                </option>
+              </select>
+            </div>
+
+            <!-- Description -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Description <span class="text-danger">*</span>
+              </label>
+              <textarea name="description"
+                        class="form-control"
+                        rows="6"
+                        placeholder="Décrivez l'événement..."
+                        required>{{ form.description.value|default:'' }}</textarea>
+            </div>
+
+            <!-- Affiche / Banner -->
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Affiche / Bannière
+              </label>
+              {% if form.instance.banner %}
+                <div class="mb-2">
+                  <img src="{{ form.instance.banner.url }}"
+                       alt="Affiche actuelle"
+                       class="bo-img-preview-lg"/>
+                  <p class="text-muted small">Affiche actuelle</p>
+                </div>
+              {% endif %}
+              <input type="file" name="banner"
+                     class="form-control"
+                     accept="image/*"/>
+              <div class="form-text">
+                Formats : JPG, PNG, WEBP. Taille max : 2 Mo.
+              </div>
+            </div>
+
+            <!-- Bouton -->
+            <div class="col-12 pt-2">
+              <button type="submit" class="btn btn-bo-primary px-5">
+                <i class="bi bi-check-lg me-2"></i>{{ btn_label }}
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-lightbulb text-warning me-2"></i>
+        Conseils
+      </h6>
+      <ul class="list-unstyled text-muted small">
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Choisissez un titre accrocheur.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Précisez le lieu exact de l'événement.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Ajoutez une belle affiche pour attirer l'attention.
+        </li>
+        <li>
+          <i class="bi bi-check text-success me-1"></i>
+          Après l'événement, passez le statut sur "Passé"
+          et ajoutez les photos dans la galerie.
+        </li>
+      </ul>
+    </div>
+
+    <!-- Lien galerie si modification -->
+    {% if form.instance.pk %}
+    <div class="card border-0 shadow-sm p-4">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-images text-success me-2"></i>
+        Galerie photos
+      </h6>
+      <p class="text-muted small">
+        Ajoutez les photos et vidéos de cet événement
+        dans la galerie.
+      </p>
+      <a href="{% url 'backoffice:gallery_create' %}"
+         class="btn btn-outline-success btn-sm w-100">
+        <i class="bi bi-plus-lg me-1"></i>Créer une galerie
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

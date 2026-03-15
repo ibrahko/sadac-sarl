@@ -1,0 +1,386 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Paramètres – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>Paramètres</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-gear me-2"></i>Paramètres du site</h4>
+    <p class="text-muted small mb-0">
+      Informations générales de SADAC SARL
+    </p>
+  </div>
+</div>
+
+<form method="post"
+      action="{% url 'backoffice:settings' %}"
+      enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <div class="row g-4">
+
+    <!-- ===== COLONNE PRINCIPALE ===== -->
+    <div class="col-lg-8">
+
+      <!-- Identité -->
+      <div class="card bo-form-card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0 fw-bold">
+            <i class="bi bi-building me-2"></i>
+            Identité de l'entreprise
+          </h6>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Nom de la société <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="name"
+                     value="{{ setting.name|default:'SADAC SARL' }}"
+                     class="form-control"
+                     required/>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Slogan
+              </label>
+              <input type="text" name="slogan"
+                     value="{{ setting.slogan|default:'' }}"
+                     class="form-control"
+                     placeholder="Ex: Ensemble pour un agrobusiness durable"/>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Description courte
+              </label>
+              <textarea name="description"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Présentation courte de SADAC SARL...">{{ setting.description|default:'' }}</textarea>
+              <div class="form-text">
+                Utilisée dans les méta-descriptions et le footer.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="card bo-form-card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0 fw-bold">
+            <i class="bi bi-telephone me-2"></i>
+            Coordonnées
+          </h6>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Email principal
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-envelope text-muted"></i>
+                </span>
+                <input type="email" name="email"
+                       value="{{ setting.email|default:'' }}"
+                       class="form-control"
+                       placeholder="contact@sadac.ml"/>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                WhatsApp
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-whatsapp text-success"></i>
+                </span>
+                <input type="text" name="whatsapp"
+                       value="{{ setting.whatsapp|default:'' }}"
+                       class="form-control"
+                       placeholder="223XXXXXXXX"/>
+              </div>
+              <div class="form-text">
+                Format international sans + (ex: 22376543210)
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Téléphone 1
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-telephone text-muted"></i>
+                </span>
+                <input type="text" name="phone1"
+                       value="{{ setting.phone1|default:'' }}"
+                       class="form-control"
+                       placeholder="+223 XX XX XX XX"/>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Téléphone 2
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-telephone text-muted"></i>
+                </span>
+                <input type="text" name="phone2"
+                       value="{{ setting.phone2|default:'' }}"
+                       class="form-control"
+                       placeholder="+223 XX XX XX XX"/>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold small">
+                Adresse
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-geo-alt text-muted"></i>
+                </span>
+                <input type="text" name="address"
+                       value="{{ setting.address|default:'' }}"
+                       class="form-control"
+                       placeholder="Cité UNICEF Niamakoro – Bamako, Mali"/>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Réseaux sociaux -->
+      <div class="card bo-form-card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0 fw-bold">
+            <i class="bi bi-share me-2"></i>
+            Réseaux sociaux
+          </h6>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Page Facebook
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-facebook text-primary"></i>
+                </span>
+                <input type="url" name="facebook_url"
+                       value="{{ setting.facebook_url|default:'' }}"
+                       class="form-control"
+                       placeholder="https://facebook.com/sadac"/>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">
+                Chaîne YouTube
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-youtube text-danger"></i>
+                </span>
+                <input type="url" name="youtube_url"
+                       value="{{ setting.youtube_url|default:'' }}"
+                       class="form-control"
+                       placeholder="https://youtube.com/@sadac"/>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="col-lg-4">
+
+      <!-- Logo -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-image text-success me-2"></i>
+            Logo du site
+          </h6>
+        </div>
+        <div class="card-body p-4">
+
+          <!-- Logo actuel -->
+          {% if setting and setting.logo %}
+            <div class="text-center mb-3 p-3 bg-light rounded-3">
+              <img src="{{ setting.logo.url }}"
+                   alt="Logo SADAC"
+                   style="max-height:80px;
+                          max-width:180px;
+                          object-fit:contain;"/>
+              <p class="text-muted small mt-2 mb-0">Logo actuel</p>
+            </div>
+          {% else %}
+            <div class="text-center mb-3 p-4 bg-light rounded-3">
+              <i class="bi bi-image text-muted"
+                 style="font-size:3rem;"></i>
+              <p class="text-muted small mt-2 mb-0">
+                Aucun logo défini
+              </p>
+            </div>
+          {% endif %}
+
+          <label class="form-label fw-semibold small">
+            Nouveau logo
+          </label>
+          <input type="file" name="logo"
+                 id="logoInput"
+                 class="form-control"
+                 accept="image/*"/>
+          <div class="form-text">
+            PNG avec fond transparent recommandé.
+            Taille max : 500 Ko.
+          </div>
+
+          <!-- Aperçu -->
+          <div id="logoPreviewContainer"
+               class="mt-3 text-center p-3 bg-light
+                      rounded-3" style="display:none;">
+            <img id="logoPreview" src="" alt="Aperçu"
+                 style="max-height:80px;
+                        max-width:180px;
+                        object-fit:contain;"/>
+            <p class="text-muted small mt-2 mb-0">Aperçu</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infos système -->
+      <div class="card border-0 shadow-sm mb-4 p-4">
+        <h6 class="fw-bold mb-3">
+          <i class="bi bi-info-circle text-success me-2"></i>
+          Informations système
+        </h6>
+        <ul class="list-unstyled text-muted small mb-0">
+          <li>
+            <span>Version Django</span>
+            <span class="fw-semibold text-dark">6.0</span>
+          </li>
+          <li>
+            <span>Utilisateur connecté</span>
+            <span class="fw-semibold text-dark">
+              {{ request.user.username }}
+            </span>
+          </li>
+          <li>
+            <span>Rôle</span>
+            <span class="fw-semibold text-dark">
+              {% if request.user.is_superuser %}
+                Superuser
+              {% elif request.user.is_staff %}
+                Staff
+              {% else %}
+                Utilisateur
+              {% endif %}
+            </span>
+          </li>
+          <li>
+            <span>Debug</span>
+            <span class="fw-semibold
+              {% if debug %}text-warning{% else %}text-success{% endif %}">
+              {% if debug %}Activé{% else %}Désactivé{% endif %}
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Liens rapides admin -->
+      <div class="card border-0 shadow-sm p-4">
+        <h6 class="fw-bold mb-3">
+          <i class="bi bi-lightning text-warning me-2"></i>
+          Liens utiles
+        </h6>
+        <div class="d-flex flex-column gap-2">
+          <a href="/admin/"
+             target="_blank"
+             class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-shield-lock me-1"></i>
+            Admin Django
+          </a>
+          <a href="{% url 'core:home' %}"
+             target="_blank"
+             class="btn btn-outline-success btn-sm">
+            <i class="bi bi-eye me-1"></i>
+            Voir le site
+          </a>
+          <a href="{% url 'backoffice:partner_list' %}"
+             class="btn btn-outline-success btn-sm">
+            <i class="bi bi-handshake me-1"></i>
+            Gérer les partenaires
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bouton sauvegarde -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm p-4">
+        <div class="d-flex align-items-center
+                    justify-content-between flex-wrap gap-3">
+          <div>
+            <h6 class="fw-bold mb-1">
+              Sauvegarder les paramètres
+            </h6>
+            <p class="text-muted small mb-0">
+              Les modifications seront appliquées
+              immédiatement sur le site.
+            </p>
+          </div>
+          <button type="submit"
+                  class="btn btn-bo-primary px-5">
+            <i class="bi bi-check-lg me-2"></i>
+            Enregistrer les paramètres
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Aperçu logo
+  document.getElementById('logoInput')
+    .addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('logoPreview').src = ev.target.result;
+        document.getElementById('logoPreviewContainer')
+          .style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+</script>
+{% endblock %}

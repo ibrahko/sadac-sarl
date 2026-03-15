@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <h1 class="fw-bold display-5">Contactez-nous</h1>
+    <p class="lead opacity-75 mt-2">
+      Notre équipe est disponible pour répondre à toutes vos questions
+    </p>
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        >Contact</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== INFOS + FORMULAIRE ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+
+      <!-- ===== INFOS DE CONTACT ===== -->
+      <div class="col-lg-4">
+        <h3 class="fw-bold mb-4">Nos coordonnées</h3>
+        <div class="divider-orange mb-4"></div>
+
+        <!-- Adresse -->
+        <div class="d-flex gap-3 mb-4">
+          <div class="flex-shrink-0">
+            <span class="bg-success bg-opacity-10 rounded-circle
+                         d-flex align-items-center justify-content-center"
+                  style="width:50px;height:50px;">
+              <i class="bi bi-geo-alt-fill text-success fs-5"></i>
+            </span>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">Adresse</h6>
+            <p class="text-muted small mb-0">
+              {{ site_settings.address|default:"Cité UNICEF Niamakoro – Bamako, Mali" }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Téléphone -->
+        <div class="d-flex gap-3 mb-4">
+          <div class="flex-shrink-0">
+            <span class="bg-success bg-opacity-10 rounded-circle
+                         d-flex align-items-center justify-content-center"
+                  style="width:50px;height:50px;">
+              <i class="bi bi-telephone-fill text-success fs-5"></i>
+            </span>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">Téléphone</h6>
+            {% if site_settings and site_settings.phone1 %}
+              <a href="tel:{{ site_settings.phone1 }}"
+                 class="text-muted small d-block text-decoration-none">
+                {{ site_settings.phone1 }}
+              </a>
+            {% endif %}
+            {% if site_settings and site_settings.phone2 %}
+              <a href="tel:{{ site_settings.phone2 }}"
+                 class="text-muted small d-block text-decoration-none">
+                {{ site_settings.phone2 }}
+              </a>
+            {% else %}
+              <p class="text-muted small mb-0">+223 00 00 00 00</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="d-flex gap-3 mb-4">
+          <div class="flex-shrink-0">
+            <span class="bg-success bg-opacity-10 rounded-circle
+                         d-flex align-items-center justify-content-center"
+                  style="width:50px;height:50px;">
+              <i class="bi bi-envelope-fill text-success fs-5"></i>
+            </span>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">Email</h6>
+            <a href="mailto:{{ site_settings.email|default:'contact@sadac.ml' }}"
+               class="text-muted small text-decoration-none">
+              {{ site_settings.email|default:"contact@sadac.ml" }}
+            </a>
+          </div>
+        </div>
+
+        <!-- WhatsApp -->
+        {% if site_settings and site_settings.whatsapp %}
+        <div class="d-flex gap-3 mb-4">
+          <div class="flex-shrink-0">
+            <span class="rounded-circle d-flex align-items-center
+                         justify-content-center"
+                  style="width:50px;height:50px;
+                         background:rgba(37,211,102,0.1);">
+              <i class="bi bi-whatsapp fs-5" style="color:#25D366;"></i>
+            </span>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">WhatsApp</h6>
+            <a href="https://wa.me/{{ site_settings.whatsapp }}"
+               target="_blank"
+               class="text-muted small text-decoration-none">
+              {{ site_settings.whatsapp }}
+            </a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Réseaux sociaux -->
+        <div class="mt-4">
+          <h6 class="fw-bold mb-3">Suivez-nous</h6>
+          <div class="d-flex gap-3">
+            {% if site_settings and site_settings.facebook_url %}
+              <a href="{{ site_settings.facebook_url }}"
+                 target="_blank"
+                 class="btn btn-outline-success btn-sm rounded-circle"
+                 style="width:40px;height:40px;
+                        display:flex;align-items:center;
+                        justify-content:center;">
+                <i class="bi bi-facebook"></i>
+              </a>
+            {% endif %}
+            {% if site_settings and site_settings.youtube_url %}
+              <a href="{{ site_settings.youtube_url }}"
+                 target="_blank"
+                 class="btn btn-outline-danger btn-sm rounded-circle"
+                 style="width:40px;height:40px;
+                        display:flex;align-items:center;
+                        justify-content:center;">
+                <i class="bi bi-youtube"></i>
+              </a>
+            {% endif %}
+            {% if site_settings and site_settings.whatsapp %}
+              <a href="https://wa.me/{{ site_settings.whatsapp }}"
+                 target="_blank"
+                 class="btn btn-sm rounded-circle text-white"
+                 style="width:40px;height:40px;
+                        background:#25D366;
+                        display:flex;align-items:center;
+                        justify-content:center;">
+                <i class="bi bi-whatsapp"></i>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Horaires -->
+        <div class="card border-0 shadow-sm mt-4 p-4"
+             style="border-left: 4px solid var(--sadac-green) !important;">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-clock text-success me-2"></i>Horaires
+          </h6>
+          <ul class="list-unstyled text-muted small mb-0">
+            >
+              <span>Lun – Ven</span>
+              <span class="fw-semibold">08h00 – 18h00</span>
+            </li>
+            >
+              <span>Samedi</span>
+              <span class="fw-semibold">09h00 – 13h00</span>
+            </li>
+            >
+              <span>Dimanche</span>
+              <span class="text-danger fw-semibold">Fermé</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- ===== FORMULAIRE ===== -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm p-4 p-lg-5">
+          <h3 class="fw-bold mb-2">Envoyez-nous un message</h3>
+          <div class="divider-orange mb-4"></div>
+          <p class="text-muted mb-4">
+            Remplissez le formulaire ci-dessous et nous vous répondrons
+            dans les plus brefs délais.
+          </p>
+
+          <form method="post" action="{% url 'core:contact' %}">
+            {% csrf_token %}
+
+            <div class="row g-3">
+
+              <!-- Nom -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person me-1 text-success"></i>
+                  Nom complet <span class="text-danger">*</span>
+                </label>
+                <input type="text"
+                       name="name"
+                       class="form-control"
+                       placeholder="Votre nom et prénom"
+                       required/>
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-envelope me-1 text-success"></i>
+                  Email
+                </label>
+                <input type="email"
+                       name="email"
+                       class="form-control"
+                       placeholder="votre@email.com"/>
+              </div>
+
+              <!-- Téléphone -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-telephone me-1 text-success"></i>
+                  Téléphone <span class="text-danger">*</span>
+                </label>
+                <input type="tel"
+                       name="phone"
+                       class="form-control"
+                       placeholder="+223 00 00 00 00"
+                       required/>
+              </div>
+
+              <!-- Sujet -->
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-chat-dots me-1 text-success"></i>
+                  Sujet <span class="text-danger">*</span>
+                </label>
+                <select name="subject" class="form-select" required>
+                  <option value="" disabled selected>
+                    Choisir un sujet
+                  </option>
+                  <option value="Demande d'information">
+                    Demande d'information
+                  </option>
+                  <option value="Demande de devis">
+                    Demande de devis
+                  </option>
+                  <option value="Partenariat">
+                    Partenariat
+                  </option>
+                  <option value="Formation">
+                    Formation
+                  </option>
+                  <option value="Commande de produit">
+                    Commande de produit
+                  </option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+
+              <!-- Message -->
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-pencil me-1 text-success"></i>
+                  Message <span class="text-danger">*</span>
+                </label>
+                <textarea name="message"
+                          class="form-control"
+                          rows="6"
+                          placeholder="Décrivez votre demande..."
+                          required></textarea>
+              </div>
+
+              <!-- Newsletter checkbox -->
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox"
+                         name="subscribe_newsletter"
+                         id="subscribeNewsletter"/>
+                         <label class="form-check-label text-muted small"
+                         for="subscribeNewsletter">
+                    Je souhaite recevoir la newsletter de SADAC
+                    (actualités, événements, nouveaux produits)
+                  </label>
+                </div>
+              </div>
+
+              <!-- Bouton -->
+              <div class="col-12">
+                <button type="submit"
+                        class="btn btn-sadac btn-lg px-5 w-100 w-md-auto">
+                  <i class="bi bi-send me-2"></i>Envoyer le message
+                </button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== CARTE GOOGLE MAPS ===== -->
+<section class="pb-5">
+  <div class="container">
+    <div class="card border-0 shadow-sm overflow-hidden">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3857.7!2d-7.9835!3d12.6392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDM4JzIxLjEiTiA3wrA1OSczNC42Ilc!5e0!3m2!1sfr!2sml!4v1234567890"
+        width="100%"
+        height="380"
+        style="border:0;"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

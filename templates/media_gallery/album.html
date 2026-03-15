@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ gallery.title }} – Galerie SADAC{% endblock %}
+
+{% block content %}
+
+<!-- ===== PAGE HEADER ===== -->
+<section class="page-header text-center">
+  <div class="container">
+    <span class="badge bg-warning text-dark mb-3">
+      <i class="bi bi-images me-1"></i>Album photo
+    </span>
+    <h1 class="fw-bold display-6">{{ gallery.title }}</h1>
+    {% if gallery.event %}
+      <p class="lead opacity-75 mt-2">
+        <i class="bi bi-calendar-event me-1"></i>
+        {{ gallery.event.title }}
+      </p>
+    {% endif %}
+    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+      <ol class="breadcrumb">
+        >
+          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+        </li>
+        >
+          <a href="{% url 'media_gallery:list' %}" class="text-warning">
+            Galerie
+          </a>
+        </li>
+        >
+          {{ gallery.title|truncatewords:5 }}
+        </li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ===== INFOS ALBUM ===== -->
+<section class="py-4 bg-light border-bottom">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <span class="text-muted small">
+          <i class="bi bi-images text-success me-1"></i>
+          <strong>{{ gallery.medias.count }}</strong> média(s)
+        </span>
+        <span class="text-muted small">
+          <i class="bi bi-calendar3 text-success me-1"></i>
+          {{ gallery.created_at|date:"d M Y" }}
+        </span>
+        {% if gallery.event %}
+          <span class="text-muted small">
+            <i class="bi bi-geo-alt text-success me-1"></i>
+            {{ gallery.event.location }}
+          </span>
+        {% endif %}
+      </div>
+      <a href="{% url 'media_gallery:list' %}"
+         class="btn btn-outline-success btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Retour à la galerie
+      </a>
+    </div>
+    {% if gallery.description %}
+      <p class="text-muted mt-3 mb-0">{{ gallery.description }}</p>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ===== MÉDIAS ===== -->
+<section class="py-5">
+  <div class="container">
+
+    {% with medias=gallery.medias.all %}
+    {% if medias %}
+
+      <!-- Filtres images / vidéos -->
+      {% with images=gallery.medias.all|dictsort:"order" %}
+      <div class="d-flex gap-2 mb-4 flex-wrap">
+        <button class="btn btn-success btn-sm rounded-pill px-3 active"
+                onclick="filterMedia('all', this)">
+          <i class="bi bi-grid me-1"></i>Tous
+          ({{ gallery.medias.count }})
+        </button>
+        <button class="btn btn-outline-success btn-sm rounded-pill px-3"
+                onclick="filterMedia('image', this)">
+          <i class="bi bi-image me-1"></i>Photos
+          ({{ gallery.medias.filter.count }})
+        </button>
+        <button class="btn btn-outline-success btn-sm rounded-pill px-3"
+                onclick="filterMedia('video', this)">
+          <i class="bi bi-play-circle me-1"></i>Vidéos
+        </button>
+      </div>
+      {% endwith %}
+
+      <!-- Grille médias -->
+      <div class="row g-3" id="mediaGrid">
+        {% for media in medias %}
+
+          {% if media.type == 'image' and media.file %}
+          <!-- IMAGE -->
+          <div class="col-lg-3 col-md-4 col-6 media-item"
+               data-type="image">
+            <div class="card border-0 shadow-sm overflow-hidden
+                        gallery-card h-100">
+              <a href="{{ media.file.url }}"
+                 data-bs-toggle="modal"
+                 data-bs-target="#lightboxModal"
+                 data-bs-src="{{ media.file.url }}"
+                 data-bs-caption="{{ media.caption }}"
+                 class="d-block overflow-hidden"
+                 style="height:200px;">
+                <img src="{{ media.file.url }}"
+                     alt="{{ media.caption|default:gallery.title }}"
+                     class="w-100 h-100 gallery-thumb"
+                     style="object-fit:cover;
+                            transition:transform 0.3s;"/>
+              </a>
+              {% if media.caption %}
+                <div class="card-body p-2">
+                  <p class="text-muted small mb-0 text-center">
+                    {{ media.caption }}
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          {% elif media.type == 'video' %}
+          <!-- VIDÉO -->
+          <div class="col-lg-4 col-md-6 media-item" data-type="video">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="ratio ratio-16x9">
+                {% if 'youtube' in media.url or 'youtu.be' in media.url %}
+                  {% with video_id=media.url|slice:"-11:" %}
+                  <iframe
+                    src="https://www.youtube.com/embed/{{ video_id }}"
+                    title="{{ media.caption|default:'Vidéo SADAC' }}"
+                    allowfullscreen
+                    class="rounded-top">
+                  </iframe>
+                  {% endwith %}
+                {% elif 'facebook' in media.url %}
+                  <iframe
+                    src="https://www.facebook.com/plugins/video.php?href={{ media.url|urlencode }}"
+                    allowfullscreen
+                    class="rounded-top">
+                  </iframe>
+                {% else %}
+                  <div class="d-flex align-items-center justify-content-center
+                              bg-dark rounded-top">
+                    <a href="{{ media.url }}" target="_blank"
+                       class="text-white text-center text-decoration-none p-4">
+                      <i class="bi bi-play-circle" style="font-size:3rem;"></i>
+                      <p class="mt-2 small">Voir la vidéo</p>
+                    </a>
+                  </div>
+                {% endif %}
+              </div>
+              {% if media.caption %}
+                <div class="card-body p-3">
+                  <p class="text-muted small mb-0 text-center">
+                    {{ media.caption }}
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+        {% endfor %}
+      </div>
+
+    {% else %}
+    <!-- Aucun média -->
+    <div class="text-center py-5">
+      <span class="bg-success bg-opacity-10 rounded-circle d-inline-flex
+                   align-items-center justify-content-center mb-4"
+            style="width:100px;height:100px;">
+        <i class="bi bi-images text-success" style="font-size:3rem;"></i>
+      </span>
+      <h4 class="fw-bold text-muted">Cet album est vide</h4>
+      <p class="text-muted">
+        Les photos et vidéos seront ajoutées prochainement.
+      </p>
+      <a href="{% url 'media_gallery:list' %}"
+         class="btn btn-sadac px-4 mt-2">
+        <i class="bi bi-arrow-left me-1"></i>Retour à la galerie
+      </a>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+  </div>
+</section>
+
+<!-- ===== LIGHTBOX MODAL ===== -->
+<div class="modal fade" id="lightboxModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content bg-dark border-0">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center p-2">
+        <img id="lightboxImg" src="" alt=""
+             class="img-fluid rounded"
+             style="max-height:80vh; object-fit:contain;"/>
+        <p id="lightboxCaption"
+           class="text-white-50 small mt-2 mb-0"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 cta-section text-white text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Participez à nos prochains événements</h2>
+    <p class="lead opacity-75 mb-4">
+      Inscrivez-vous à notre newsletter pour être informé
+      de nos prochaines activités.
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{% url 'events:list' %}"
+         class="btn btn-warning btn-lg px-5 fw-bold">
+        <i class="bi bi-calendar-event me-2"></i>Voir les événements
+      </a>
+      <a href="{% url 'core:contact' %}"
+         class="btn btn-outline-light btn-lg px-5">
+        <i class="bi bi-envelope me-2"></i>Nous contacter
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Lightbox
+  const lightboxModal = document.getElementById('lightboxModal');
+  lightboxModal.addEventListener('show.bs.modal', function (event) {
+    const trigger = event.relatedTarget;
+    const src = trigger.getAttribute('data-bs-src');
+    const caption = trigger.getAttribute('data-bs-caption');
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxCaption').textContent = caption || '';
+  });
+
+  // Filtre image/vidéo
+  function filterMedia(type, btn) {
+    document.querySelectorAll('.media-item').forEach(item => {
+      if (type === 'all' || item.dataset.type === type) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    document.querySelectorAll('[onclick]').forEach(b => {
+      b.classList.remove('btn-success', 'active');
+      b.classList.add('btn-outline-success');
+    });
+    btn.classList.remove('btn-outline-success');
+    btn.classList.add('btn-success', 'active');
+  }
+</script>
+{% endblock %}

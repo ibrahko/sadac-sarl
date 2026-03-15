@@ -1,0 +1,143 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Catégories – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>
+    <a href="{% url 'backoffice:product_list' %}">Produits</a>
+  </li>
+  <li>Catégories</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-tags me-2"></i>Catégories de produits</h4>
+    <p class="text-muted small mb-0">
+      {{ categories|length }} catégorie(s)
+    </p>
+  </div>
+  <a href="{% url 'backoffice:category_create' %}"
+     class="btn btn-bo-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>Ajouter une catégorie
+  </a>
+</div>
+
+<div class="row g-4">
+
+  <!-- Liste catégories -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        {% if categories %}
+        <div class="table-responsive">
+          <table class="table bo-table mb-0">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Slug</th>
+                <th>Produits</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cat in categories %}
+              <tr>
+                <td class="fw-semibold small">{{ cat.name }}</td>
+                <td>
+                  <code class="small text-muted">{{ cat.slug }}</code>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-success bg-opacity-10
+                               text-success fw-semibold">
+                    {{ cat.products.count }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="{% url 'backoffice:category_update' cat.pk %}"
+                       class="btn btn-sm btn-outline-success"
+                       title="Modifier">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'backoffice:category_delete' cat.pk %}"
+                       class="btn btn-sm btn-outline-danger"
+                       title="Supprimer">
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="bo-empty">
+          <i class="bi bi-tags"></i>
+          <p>Aucune catégorie créée pour le moment.</p>
+          <a href="{% url 'backoffice:category_create' %}"
+             class="btn btn-bo-primary btn-sm">
+            Créer la première catégorie
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire ajout rapide -->
+  <div class="col-lg-4">
+    <div class="card bo-form-card">
+      <div class="card-header">
+        <h6 class="mb-0 fw-bold">
+          <i class="bi bi-plus-circle me-2"></i>
+          Ajout rapide
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <form method="post"
+              action="{% url 'backoffice:category_create' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">
+              Nom <span class="text-danger">*</span>
+            </label>
+            <input type="text" name="name"
+                   class="form-control"
+                   placeholder="Ex: Maraîchage"
+                   required/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">
+              Slug
+              <span class="text-muted fw-normal">
+                (généré automatiquement)
+              </span>
+            </label>
+            <input type="text" name="slug"
+                   class="form-control"
+                   placeholder="ex: maraichage"/>
+            <div class="form-text">
+              Laissez vide pour générer automatiquement.
+            </div>
+          </div>
+          <div class="mb-3">
+            <liabel class="form-label fw-semibold small">
+              Description
+            </label>
+            <textarea name="description"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Description optionnelle..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-bo-primary w-100">
+            <i class="bi bi-check-lg me-2"></i>Enregistrer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

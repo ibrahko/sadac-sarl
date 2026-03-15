@@ -1,0 +1,209 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Commandes – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  >Commandes</li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4><i class="bi bi-cart-check me-2"></i>Commandes</h4>
+    <p class="text-muted small mb-0">
+      Gérez toutes les demandes de commande
+    </p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap align-items-center">
+    {% if count_new %}
+      <span class="badge bg-danger fs-6 px-3 py-2">
+        <i class="bi bi-bell me-1"></i>
+        {{ count_new }} nouvelle(s)
+      </span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Stats rapides -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm p-3 text-center">
+      <div class="fw-bold fs-3 text-primary">{{ count_new }}</div>
+      <div class="text-muted small">Nouvelles</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm p-3 text-center">
+      <div class="fw-bold fs-3 text-warning">{{ count_processing }}</div>
+      <div class="text-muted small">En cours</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm p-3 text-center">
+      <div class="fw-bold fs-3 text-success">{{ count_delivered }}</div>
+      <div class="text-muted small">Livrées</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filtres statut -->
+<div class="d-flex gap-2 mb-4 flex-wrap">
+  <a href="{% url 'backoffice:order_list' %}"
+     class="btn btn-sm rounded-pill px-3
+     {% if not current_status %}btn-success{% else %}btn-outline-success{% endif %}">
+    <i class="bi bi-grid me-1"></i>Toutes
+  </a>
+  {% for value, label in status_choices %}
+    <a href="{% url 'backoffice:order_list' %}?status={{ value }}"
+       class="btn btn-sm rounded-pill px-3
+       {% if current_status == value %}btn-success{% else %}btn-outline-success{% endif %}">
+      {{ label }}
+      {% if value == 'new' and count_new %}
+        <span class="badge bg-danger ms-1">{{ count_new }}</span>
+      {% endif %}
+    </a>
+  {% endfor %}
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if orders %}
+    <div class="table-responsive">
+      <table class="table bo-table mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Client</th>
+            <th>Produit</th>
+            <th>Quantité</th>
+            <th>Statut</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr {% if order.status == 'new' %}
+              style="background:rgba(59,130,246,0.04);"
+              {% endif %}>
+            <td class="text-muted small fw-semibold">
+              #{{ order.pk }}
+            </td>
+            <td>
+              <div class="fw-semibold small">{{ order.full_name }}</div>
+              <div class="text-muted small">
+                <i class="bi bi-telephone me-1"></i>{{ order.phone }}
+              </div>
+              {% if order.email %}
+                <div class="text-muted small">
+                  <i class="bi bi-envelope me-1"></i>{{ order.email }}
+                </div>
+              {% endif %}
+            </td>
+            <td class="small">
+              {% if order.product %}
+                <span class="fw-semibold">{{ order.product.title }}</span>
+                <div class="text-muted small">
+                  {{ order.product.category }}
+                </div>
+              {% else %}
+                <span class="text-muted">Produit supprimé</span>
+              {% endif %}
+            </td>
+            <td class="text-center fw-semibold">
+              {{ order.quantity }}
+            </td>
+            <td>
+              {% if order.status == 'new' %}
+                <span class="badge badge-new">Nouveau</span>
+              {% elif order.status == 'processing' %}
+                <span class="badge badge-processing">En cours</span>
+              {% elif order.status == 'delivered' %}
+                <span class="badge badge-delivered">Livré</span>
+              {% else %}
+                <span class="badge badge-cancelled">Annulé</span>
+              {% endif %}
+            </td>
+            <td class="text-muted small">
+              {{ order.created_at|date:"d M Y" }}
+              <div>{{ order.created_at|date:"H:i" }}</div>
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'backoffice:order_detail' order.pk %}"
+                   class="btn btn-sm btn-outline-success"
+                   title="Voir détail">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if order.phone %}
+                  <a href="https://wa.me/{{ order.phone }}"
+                     target="_blank"
+                     class="btn btn-sm btn-success"
+                     title="WhatsApp">
+                    <i class="bi bi-whatsapp"></i>
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="p-3 border-top d-flex justify-content-center">
+        <ul class="pagination mb-0">
+          {% if page_obj.has_previous %}
+            >
+              <a class="page-link"
+                 href="?page={{ page_obj.previous_page_number }}
+                       {% if current_status %}&status={{ current_status }}{% endif %}">
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            
+              {% if page_obj.number == num %}active{% endif %}">
+              <a class="page-link"
+                 href="?page={{ num }}
+                       {% if current_status %}&status={{ current_status }}{% endif %}">
+                {{ num }}
+              </a>
+            </li>
+          {% endfor %}
+          {% if page_obj.has_next %}
+            >
+              <a class="page-link"
+                 href="?page={{ page_obj.next_page_number }}
+                       {% if current_status %}&status={{ current_status }}{% endif %}">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bo-empty">
+      <i class="bi bi-cart-x"></i>
+      <p>Aucune commande
+        {% if current_status %}
+          avec le statut "{{ current_status }}"
+        {% endif %}
+        pour le moment.
+      </p>
+      {% if current_status %}
+        <a href="{% url 'backoffice:order_list' %}"
+           class="btn btn-outline-success btn-sm">
+          Voir toutes les commandes
+        </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

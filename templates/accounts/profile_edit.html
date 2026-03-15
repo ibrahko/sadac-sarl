@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Modifier mon profil – SADAC SARL{% endblock %}
+
+{% block content %}
+
+<section class="py-5"
+         style="min-height:80vh;
+                background:var(--sadac-bg-light);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+
+        <!-- En-tête -->
+        <div class="d-flex align-items-center
+                    justify-content-between mb-4 flex-wrap gap-3">
+          <h3 class="fw-bold mb-0">
+            <i class="bi bi-pencil-square
+               text-success me-2"></i>
+            Modifier mon profil
+          </h3>
+          <a href="{% url 'accounts:profile' %}"
+             class="btn btn-outline-secondary btn-sm px-4">
+            <i class="bi bi-arrow-left me-1"></i>Retour
+          </a>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header"
+               style="background:linear-gradient(135deg,
+                        var(--sadac-green-dark),
+                        var(--sadac-green));">
+            <h6 class="text-white fw-bold mb-0">
+              <i class="bi bi-person me-2"></i>
+              Informations personnelles
+            </h6>
+          </div>
+          <div class="card-body p-4">
+            <form method="post"
+                  action="{% url 'accounts:profile_edit' %}">
+              {% csrf_token %}
+              <div class="row g-3">
+
+                <!-- Prénom -->
+                <div class="col-md-6">
+                  abel class="form-label fw-semibold small">
+                    Prénom
+                  </label>
+                  <input type="text"
+                         name="first_name"
+                         value="{{ user_form.first_name.value|default:'' }}"
+                         class="form-control"
+                         placeholder="Votre prénom"/>
+                </div>
+
+                <!-- Nom -->
+                <div class="col-md-6">
+                  abel class="form-label fw-semibold small">
+                    Nom
+                  </label>
+                  <input type="text"
+                         name="last_name"
+                         value="{{ user_form.last_name.value|default:'' }}"
+                         class="form-control"
+                         placeholder="Votre nom"/>
+                </div>
+
+                <!-- Email -->
+                <div class="col-12">
+                  abel class="form-label fw-semibold small">
+                    Email
+                  </label>
+                  <input type="email"
+                         name="email"
+                         value="{{ user_form.email.value|default:'' }}"
+                         class="form-control"
+                         placeholder="votre@email.com"/>
+                </div>
+
+                <!-- Téléphone -->
+                <div class="col-md-6">
+                  abel class="form-label fw-semibold small">
+                    Téléphone
+                  </label>
+                  <input type="text"
+                         name="phone"
+                         value="{{ profile_form.phone.value|default:'' }}"
+                         class="form-control"
+                         placeholder="+223 XX XX XX XX"/>
+                </div>
+
+                <!-- Fonction -->
+                <div class="col-md-6">
+                  abel class="form-label fw-semibold small">
+                    Fonction / Poste
+                  </label>
+                  <input type="text"
+                         name="job_title"
+                         value="{{ profile_form.job_title.value|default:'' }}"
+                         class="form-control"
+                         placeholder="Ex: Responsable communication"/>
+                </div>
+
+                <!-- Boutons -->
+                <div class="col-12 pt-2 d-flex gap-3">
+                  <button type="submit"
+                          class="btn btn-sadac px-5">
+                    <i class="bi bi-check-lg me-2"></i>
+                    Enregistrer
+                  </button>
+                  <a href="{% url 'accounts:profile' %}"
+                     class="btn btn-outline-secondary px-4">
+                    Annuler
+                  </a>
+                </div>
+
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

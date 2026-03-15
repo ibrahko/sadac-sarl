@@ -1,0 +1,160 @@
+{% extends "backoffice/base_bo.html" %}
+
+{% block title %}Message de {{ message.name }} – Backoffice SADAC{% endblock %}
+
+{% block breadcrumb %}
+  <li>
+    <a href="{% url 'backoffice:message_list' %}">Messages</a>
+  </li>
+  <li>
+    {{ message.name }}
+  </li>
+{% endblock %}
+
+{% block content %}
+<div class="bo-page-header">
+  <div>
+    <h4>
+      <i class="bi bi-envelope-open me-2"></i>
+      Message de {{ message.name }}
+    </h4>
+    <p class="text-muted small mb-0">
+      Reçu le {{ message.created_at|date:"d M Y à H:i" }}
+    </p>
+  </div>
+  <a href="{% url 'backoffice:message_list' %}"
+     class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+<div class="row g-4">
+
+  <!-- Message -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle bg-success d-flex align-items-center
+                      justify-content-center text-white fw-bold flex-shrink-0"
+               style="width:48px;height:48px;font-size:1.2rem;">
+            {{ message.name|slice:":1"|upper }}
+          </div>
+          <div>
+            <h6 class="fw-bold mb-0">{{ message.name }}</h6>
+            <p class="text-muted small mb-0">
+              {{ message.created_at|date:"d M Y à H:i" }}
+            </p>
+          </div>
+          <div class="ms-auto">
+            <span class="badge bg-warning text-dark">
+              {{ message.subject }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-4">
+        <div class="bg-light rounded-3 p-4">
+          <p class="mb-0 lh-lg" style="white-space:pre-wrap;">{{ message.message }}</p>
+        </div>
+      </div>
+      <div class="card-footer bg-white border-0 px-4 pb-4">
+        <div class="d-flex gap-2 flex-wrap">
+          {% if message.email %}
+            <a href="mailto:{{ message.email }}"
+               class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-reply me-1"></i>
+              Répondre par email
+            </a>
+          {% endif %}
+          {% if message.phone %}
+            <a href="tel:{{ message.phone }}"
+               class="btn btn-outline-success btn-sm">
+              <i class="bi bi-telephone me-1"></i>
+              Appeler
+            </a>
+            <a href="https://wa.me/{{ message.phone }}"
+               target="_blank"
+               class="btn btn-success btn-sm">
+              <i class="bi bi-whatsapp me-1"></i>
+              WhatsApp
+            </a>
+          {% endif %}
+          <a href="{% url 'backoffice:message_delete' message.pk %}"
+             class="btn btn-outline-danger btn-sm ms-auto"
+             onclick="return confirm('Supprimer ce message ?')">
+            <i class="bi bi-trash me-1"></i>
+            Supprimer
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar infos -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h6 class="fw-bold">
+          <i class="bi bi-person text-success me-2"></i>
+          Informations expéditeur
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        <ul class="list-unstyled mb-0">
+          <li>
+            <p class="text-muted small mb-1">Nom</p>
+            <p class="fw-semibold mb-0">{{ message.name }}</p>
+          </li>
+          {% if message.email %}
+          <li>
+            <p class="text-muted small mb-1">Email</p>
+            <a href="mailto:{{ message.email }}"
+               class="fw-semibold text-dark text-decoration-none">
+              <i class="bi bi-envelope text-success me-1"></i>
+              {{ message.email }}
+            </a>
+          </li>
+          {% endif %}
+          {% if message.phone %}
+          <li>
+            <p class="text-muted small mb-1">Téléphone</p>
+            <a href="tel:{{ message.phone }}"
+               class="fw-semibold text-dark text-decoration-none">
+              <i class="bi bi-telephone text-success me-1"></i>
+              {{ message.phone }}
+            </a>
+          </li>
+          {% endif %}
+          <li>
+            <p class="text-muted small mb-1">Sujet</p>
+            <span class="badge bg-warning text-dark">
+              {{ message.subject }}
+            </span>
+          </li>
+          <li>
+            <p class="text-muted small mb-1">Statut</p>
+            <span class="badge bg-success">
+              <i class="bi bi-check2 me-1"></i>Lu
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Navigation messages -->
+    <div class="card border-0 shadow-sm p-4">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-arrow-left-right text-success me-2"></i>
+        Navigation
+      </h6>
+      <a href="{% url 'backoffice:message_list' %}"
+         class="btn btn-outline-success w-100 mb-2">
+        <i class="bi bi-list me-1"></i>
+        Tous les messages
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

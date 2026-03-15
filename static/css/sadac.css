@@ -1,0 +1,188 @@
+:root {
+    --sadac-green:       #2E7D32;
+    --sadac-green-dark:  #1B5E20;
+    --sadac-green-light: #A5D6A7;
+    --sadac-orange:      #F57F17;
+    --sadac-yellow:      #FFA000;
+    --sadac-white:       #FFFFFF;
+    --sadac-text:        #212121;
+    --sadac-text-muted:  #757575;
+    --sadac-bg-light:    #F9FBF9;
+  }
+  
+  /* ===== NAVBAR ===== */
+  .navbar {
+    background-color: var(--sadac-green-dark);
+  }
+  .navbar-brand,
+  .nav-link {
+    color: var(--sadac-white) !important;
+    font-weight: 500;
+  }
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--sadac-yellow) !important;
+  }
+  .navbar-toggler-icon {
+    filter: invert(1);
+  }
+  
+  /* ===== HERO ===== */
+  .hero-section {
+    background: linear-gradient(135deg,
+        var(--sadac-green-dark) 0%,
+        var(--sadac-green) 60%,
+        var(--sadac-orange) 100%);
+    color: var(--sadac-white);
+    padding: 100px 0;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* ===== BOUTONS ===== */
+  .btn-sadac {
+    background-color: var(--sadac-green);
+    color: var(--sadac-white);
+    border: none;
+    transition: background 0.2s;
+  }
+  .btn-sadac:hover {
+    background-color: var(--sadac-green-dark);
+    color: var(--sadac-white);
+  }
+  .btn-accent {
+    background-color: var(--sadac-orange);
+    color: var(--sadac-white);
+    border: none;
+    transition: background 0.2s;
+  }
+  .btn-accent:hover {
+    background-color: #e65100;
+    color: var(--sadac-white);
+  }
+  
+  /* ===== CARDS ===== */
+  .card-service {
+    border-top: 4px solid var(--sadac-green) !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card-service:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+  }
+  .card-product {
+    border-top: 4px solid var(--sadac-orange) !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card-product:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+  }
+  
+  /* ===== IMAGES UNIFORMES ===== */
+  .product-img,
+  .event-img,
+  .post-img {
+    height: 220px;
+    object-fit: cover;
+    width: 100%;
+  }
+  .product-img-placeholder,
+  .post-img-placeholder {
+    height: 220px;
+    width: 100%;
+  }
+  
+  /* ===== DIVIDER ===== */
+  .divider-orange {
+    width: 60px;
+    height: 4px;
+    background-color: var(--sadac-orange);
+    border-radius: 2px;
+  }
+  
+  /* ===== FOOTER ===== */
+  footer {
+    background-color: var(--sadac-green-dark);
+    color: var(--sadac-white);
+  }
+  .footer-link {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  .footer-link:hover {
+    color: var(--sadac-yellow);
+  }
+  
+  /* ===== CTA SECTION ===== */
+  .cta-section {
+    background: linear-gradient(135deg,
+      var(--sadac-green-dark),
+      var(--sadac-green));
+  }
+  
+  /* ===== WHATSAPP FLOAT ===== */
+  .whatsapp-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #25D366;
+    color: white;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    z-index: 9999;
+    text-decoration: none;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    transition: background 0.2s;
+  }
+  .whatsapp-float:hover {
+    background-color: #128C7E;
+    color: white;
+  }
+  
+  /* ===== PARTNERS ===== */
+  .partner-logo {
+    max-height: 70px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+    filter: grayscale(100%);
+  }
+  .partner-logo:hover {
+    opacity: 1;
+    filter: none;
+  }
+  
+  /* ===== PAGES INTERNES ===== */
+  .page-header {
+    background: linear-gradient(135deg,
+      var(--sadac-green-dark),
+      var(--sadac-green));
+    color: white;
+    padding: 60px 0;
+  }
+  
+  .hover-green:hover {
+    background-color: rgba(46, 125, 50, 0.08);
+    color: var(--sadac-green) !important;
+    transition: background 0.2s;
+  }
+
+  .page-link {
+    color: var(--sadac-green);
+    border-color: #dee2e6;
+  }
+  .page-link:hover {
+    background-color: var(--sadac-green-light);
+    color: var(--sadac-green-dark);
+  }
+  .page-item.active .page-link {
+    background-color: var(--sadac-green);
+    border-color: var(--sadac-green);
+    color: white;
+  }
