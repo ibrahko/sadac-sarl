@@ -46,6 +46,7 @@ RUN SECRET_KEY=build-only \
     EMAIL_HOST_USER=x EMAIL_HOST_PASSWORD=x \
     DEFAULT_FROM_EMAIL=x SADAC_EMAIL=x \
     DB_NAME=x DB_USER=x DB_PASSWORD=x \
+    DB_HOST=x DB_PORT=5432 \
     DJANGO_SETTINGS_MODULE=sadac.settings.prod \
     python manage.py collectstatic --no-input 2>&1 || true
 
