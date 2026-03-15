@@ -9,3 +9,5 @@ gunicorn
 pytest
 pytest-django
 pytest-cov
+django-cloudinary-storage
+cloudinary
