@@ -25,7 +25,7 @@ SECURE_HSTS_PRELOAD = True
 X_FRAME_OPTIONS = 'DENY'
 
 # Cloudinary — stockage média
-INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
+INSTALLED_APPS = ['cloudinary_storage'] + INSTALLED_APPS + ['cloudinary']
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
