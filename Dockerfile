@@ -47,11 +47,9 @@ RUN SECRET_KEY=build-only \
     DEFAULT_FROM_EMAIL=x SADAC_EMAIL=x \
     DB_NAME=x DB_USER=x DB_PASSWORD=x \
     DB_HOST=x DB_PORT=5432 \
-    CLOUDINARY_CLOUD_NAME=x \
-    CLOUDINARY_API_KEY=x \
-    CLOUDINARY_API_SECRET=x \
-    DJANGO_SETTINGS_MODULE=sadac.settings.prod \
+    DJANGO_SETTINGS_MODULE=sadac.settings.base \
     python manage.py collectstatic --no-input 2>&1 || true
+
 
 RUN ls -la /app/staticfiles/ && ls -la /app/staticfiles/img/ || echo "STATIC FILES MISSING"
 
