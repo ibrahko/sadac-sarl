@@ -41,10 +41,12 @@ COPY . .
 RUN SECRET_KEY=build-only \
     DEBUG=False \
     ALLOWED_HOSTS=* \
+    CSRF_TRUSTED_ORIGINS=https://example.com \
     EMAIL_HOST=x EMAIL_PORT=587 \
     EMAIL_HOST_USER=x EMAIL_HOST_PASSWORD=x \
     DEFAULT_FROM_EMAIL=x SADAC_EMAIL=x \
     DB_NAME=x DB_USER=x DB_PASSWORD=x \
+    DJANGO_SETTINGS_MODULE=sadac.settings.prod \
     python manage.py collectstatic --no-input 2>/dev/null || true
 
 # Créer les dossiers nécessaires
@@ -55,16 +57,9 @@ RUN mkdir -p /app/media /app/staticfiles /app/logs && \
 USER sadac
 
 # Exposer le port
-EXPOSE 8000
+EXPOSE ${PORT:-8000}
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD curl -f http://localhost:8000/ || exit 1
+
 
 # Démarrage avec Gunicorn
-CMD ["gunicorn", "sadac.wsgi:application", \
-     "--bind", "0.0.0.0:8000", \
-     "--workers", "3", \
-     "--timeout", "120", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-"]
+CMD python manage.py migrate --no-input && gunicorn sadac.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120 --access-logfile - --error-logfile -
