@@ -67,4 +67,13 @@ EXPOSE ${PORT:-8000}
 
 
 # Démarrage avec Gunicorn
-CMD python manage.py migrate --no-input && gunicorn sadac.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120 --access-logfile - --error-logfile -
+CMD python manage.py migrate --no-input && \
+    python manage.py createsuperuser --noinput \
+    --settings=sadac.settings.prod || true && \
+    gunicorn sadac.wsgi:application \
+    --bind 0.0.0.0:${PORT:-8000} \
+    --workers 3 \
+    --timeout 120 \
+    --access-logfile - \
+    --error-logfile -
+
