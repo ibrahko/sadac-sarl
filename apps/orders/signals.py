@@ -17,7 +17,7 @@ Nom : {instance.full_name}
 Téléphone : {instance.phone}
 Email : {instance.email}
 Produit : {instance.product}
-Quantité : {instance.quantity}
+Quantité : {instance.quantity} {instance.get_unit_display()}
 Message : {instance.message}
         """,
         from_email=settings.DEFAULT_FROM_EMAIL,

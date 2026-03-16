@@ -122,6 +122,35 @@
                          class="form-control"
                          value="1" min="1" required/>
                 </div>
+                <!-- Unité -->
+                <div class="col-md-4">
+                  abel class="form-label fw-semibold small">
+                    <i class="bi bi-rulers me-1 text-success"></i>
+                    Unité
+                    <span class="text-danger">*</span>
+                  </label>
+                  <select name="unit" class="form-select" required>
+                    <option value="kg">Kilogramme (kg)</option>
+                    <option value="sac">Sac</option>
+                    <option value="tonne">Tonne</option>
+                    <option value="litre">Litre</option>
+                    <option value="unite">Unité</option>
+                  </select>
+                </div>
+                
+                <div class="col-md-4">
+                  abel class="form-label fw-semibold small">
+                    &nbsp;
+                  </label>
+                  <div class="form-control bg-light border-0
+                              d-flex align-items-center"
+                       id="quantityPreview"
+                       style="height:38px;">
+                    <span class="text-muted small">
+                      Ex: <strong>5 kg</strong>
+                    </span>
+                  </div>
+                </div>
 
                 <!-- Message -->
                 <div class="col-12">
@@ -352,4 +381,29 @@
   </div>
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function updatePreview() {
+    var qty  = document.querySelector('[name="quantity"]').value;
+    var unit = document.querySelector('[name="unit"]').value;
+    var labels = {
+      'kg': 'kg', 'sac': 'sac(s)',
+      'tonne': 'tonne(s)', 'litre': 'litre(s)',
+      'unite': 'unité(s)'
+    };
+    document.getElementById('quantityPreview').innerHTML =
+      '<span class="text-success fw-bold">' +
+      qty + ' ' + (labels[unit] || unit) +
+      '</span>';
+  }
+
+  document.querySelector('[name="quantity"]')
+    .addEventListener('input', updatePreview);
+  document.querySelector('[name="unit"]')
+    .addEventListener('change', updatePreview);
+
+  updatePreview();
+</script>
 {% endblock %}
