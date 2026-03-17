@@ -346,7 +346,7 @@ class GalleryDeleteView(StaffRequiredMixin, DeleteView):
 # MÉDIAS
 # ===================================================
 class MediaCreateView(StaffRequiredMixin, View):
-    template_name = "backoffice/gallery/form.html"
+    template_name = "backoffice/gallery/media_form.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.gallery = get_object_or_404(

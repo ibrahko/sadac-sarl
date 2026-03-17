@@ -3,15 +3,15 @@
 {% block title %}Ajouter des médias – Backoffice SADAC{% endblock %}
 
 {% block breadcrumb %}
-  >
+  <li>
     <a href="{% url 'backoffice:gallery_list' %}">Galerie</a>
   </li>
-  >
+  <li>
     <a href="{% url 'backoffice:gallery_update' gallery.pk %}">
       {{ gallery.title }}
     </a>
   </li>
-  >Ajouter des médias</li>
+  <li>Ajouter des médias</li>
 {% endblock %}
 
 {% block extra_css %}
@@ -110,7 +110,7 @@
 
             <!-- Type -->
             <div class="col-12">
-              abel class="form-label fw-semibold small">
+              <label class="form-label fw-semibold small">
                 Type <span class="text-danger">*</span>
               </label>
               <div class="d-flex gap-4">
@@ -119,7 +119,7 @@
                          type="radio" name="type"
                          id="typeImage" value="image"
                          checked onchange="toggleType()"/>
-                  abel class="form-check-label fw-semibold"
+                  <label class="form-check-label fw-semibold"
                          for="typeImage">
                     <i class="bi bi-images text-success me-1"></i>
                     Photos (multiple)
@@ -130,7 +130,7 @@
                          type="radio" name="type"
                          id="typeVideo" value="video"
                          onchange="toggleType()"/>
-                  abel class="form-check-label fw-semibold"
+                  <label class="form-check-label fw-semibold"
                          for="typeVideo">
                     <i class="bi bi-play-circle text-primary me-1"></i>
                     Vidéo
@@ -179,7 +179,7 @@
             <!-- URL vidéo -->
             <div class="col-12" id="videoField"
                  style="display:none;">
-              abel class="form-label fw-semibold small">
+              <label class="form-label fw-semibold small">
                 URL YouTube / Facebook
                 <span class="text-danger">*</span>
               </label>
@@ -201,7 +201,7 @@
 
             <!-- Légende -->
             <div class="col-12">
-              abel class="form-label fw-semibold small">
+              <label class="form-label fw-semibold small">
                 Légende
                 <span class="text-muted fw-normal">(optionnel)</span>
               </label>
@@ -212,7 +212,7 @@
 
             <!-- Ordre -->
             <div class="col-md-4">
-              abel class="form-label fw-semibold small">
+              <label class="form-label fw-semibold small">
                 Ordre
               </label>
               <input type="number" name="order"
@@ -249,19 +249,19 @@
         Conseils
       </h6>
       <ul class="list-unstyled text-muted small mb-0">
-        >
+        <li>
           <i class="bi bi-check text-success me-1"></i>
           Glissez plusieurs photos d'un coup.
         </li>
-        >
+        <li>
           <i class="bi bi-check text-success me-1"></i>
           Max 10 Mo par image.
         </li>
-        >
+        <li>
           <i class="bi bi-check text-success me-1"></i>
           Pour les vidéos, collez le lien YouTube/Facebook.
         </li>
-        >
+        <li>
           <i class="bi bi-check text-success me-1"></i>
           Cliquez sur <i class="bi bi-x-circle text-danger"></i>
           pour retirer une photo avant envoi.
