@@ -6,13 +6,16 @@
   <li>
     <a href="{% url 'backoffice:gallery_list' %}">Galerie</a>
   </li>
-  <li>
-    <a href="{% url 'backoffice:gallery_update' gallery.pk %}">
-      {{ gallery.title }}
-    </a>
-  </li>
-  <li>Ajouter des médias</li>
+  {% if form.instance.pk %}
+    <li>
+      <a href="{% url 'backoffice:gallery_update' form.instance.pk %}">
+        {{ form.instance.title }}
+      </a>
+    </li>
+  {% endif %}
+  <li>{{ title }}</li>
 {% endblock %}
+
 
 {% block content %}
 <div class="bo-page-header">
@@ -26,10 +29,18 @@
       – {{ gallery.medias.count }} média(s) existant(s)
     </p>
   </div>
-  <a href="{% url 'backoffice:gallery_update' gallery.pk %}"
-     class="btn btn-outline-secondary btn-sm">
-    <i class="bi bi-arrow-left me-1"></i>Retour à l'album
-  </a>
+    {% if form.instance.pk %}
+    <a href="{% url 'backoffice:gallery_update' form.instance.pk %}"
+      class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Retour à l'album
+    </a>
+    {% else %}
+      <a href="{% url 'backoffice:gallery_list' %}"
+        class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Retour
+      </a>
+    {% endif %}
+
 </div>
 
 <div class="row g-4">
@@ -191,10 +202,18 @@
                 <i class="bi bi-upload me-2"></i>
                 <span id="submitLabel">Ajouter les photos</span>
               </button>
-              <a href="{% url 'backoffice:gallery_update' gallery.pk %}"
-                 class="btn btn-outline-secondary px-4">
-                Annuler
-              </a>
+              {% if form.instance.pk %}
+                <a href="{% url 'backoffice:gallery_update' form.instance.pk %}"
+                  class="btn btn-outline-secondary px-4">
+                  Annuler
+                </a>
+              {% else %}
+                <a href="{% url 'backoffice:gallery_list' %}"
+                  class="btn btn-outline-secondary px-4">
+                  Annuler
+                </a>
+              {% endif %}
+
             </div>
 
           </div>
