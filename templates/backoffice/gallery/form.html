@@ -2,67 +2,8 @@
 
 {% block title %}{{ title }} – Backoffice SADAC{% endblock %}
 
-{% block extra_css %}
-<style>
-  .drop-zone {
-    border: 2px dashed #2E7D32;
-    background: rgba(46,125,50,0.03);
-    cursor: pointer;
-    transition: background 0.2s;
-    border-radius: 12px;
-    padding: 30px 20px;
-    text-align: center;
-  }
-  .drop-zone:hover,
-  .drop-zone.drop-active {
-    background: rgba(46,125,50,0.10);
-    border-color: #FFA000;
-  }
-  .preview-item {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
-    flex-shrink: 0;
-    display: inline-block;
-  }
-  .preview-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .preview-remove {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    background: rgba(239,68,68,0.9);
-    border: none;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    color: white;
-    font-size: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-  }
-  #previewGrid {
-    display: flex !important;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-</style>
-{% endblock %}
-
 {% block breadcrumb %}
-  >
+  <li>
     <a href="{% url 'backoffice:gallery_list' %}">Galerie</a>
   </li>
   >{{ title }}</li>
@@ -84,7 +25,7 @@
 
 <div class="row g-4">
 
-  <!-- ===== FORMULAIRE ===== -->
+  <!-- FORMULAIRE -->
   <div class="col-lg-6">
     <div class="card bo-form-card">
       <div class="card-header">
@@ -98,7 +39,6 @@
           {% csrf_token %}
           <div class="row g-3">
 
-            <!-- Titre -->
             <div class="col-12">
               <label class="form-label fw-semibold small">
                 Titre de l'album
@@ -111,7 +51,6 @@
                      required/>
             </div>
 
-            <!-- Événement lié -->
             <div class="col-12">
               <label class="form-label fw-semibold small">
                 Événement lié
@@ -120,16 +59,13 @@
               <select name="event"
                       class="form-select"
                       required>
-                <option value="">
-                  -- Choisir un événement --
-                </option>
+                <option value="">-- Choisir un événement --</option>
                 {% for event in form.fields.event.queryset %}
                   <option value="{{ event.pk }}"
                     {% if form.event.value|stringformat:"s" == event.pk|stringformat:"s" %}
                       selected
                     {% endif %}>
-                    {{ event.title }}
-                    ({{ event.start_date|date:"M Y" }})
+                    {{ event.title }} ({{ event.start_date|date:"M Y" }})
                   </option>
                 {% endfor %}
               </select>
@@ -139,13 +75,10 @@
               </div>
             </div>
 
-            <!-- Description -->
             <div class="col-12">
               <label class="form-label fw-semibold small">
                 Description
-                <span class="text-muted fw-normal">
-                  (optionnel)
-                </span>
+                <span class="text-muted fw-normal">(optionnel)</span>
               </label>
               <textarea name="description"
                         class="form-control"
@@ -153,12 +86,10 @@
                         placeholder="Description de l'album...">{{ form.description.value|default:'' }}</textarea>
             </div>
 
-            <!-- Bouton -->
             <div class="col-12 pt-2">
               <button type="submit"
                       class="btn btn-bo-primary w-100">
-                <i class="bi bi-check-lg me-2"></i>
-                {{ btn_label }}
+                <i class="bi bi-check-lg me-2"></i>{{ btn_label }}
               </button>
             </div>
 
@@ -168,15 +99,13 @@
     </div>
   </div>
 
-  <!-- ===== SIDEBAR ===== -->
+  <!-- SIDEBAR -->
   <div class="col-lg-6">
 
     {% if form.instance.pk %}
-    <!-- Médias existants -->
     <div class="card border-0 shadow-sm mb-4">
       <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
-        <div class="d-flex align-items-center
-                    justify-content-between">
+        <div class="d-flex align-items-center justify-content-between">
           <h6 class="fw-bold mb-0">
             <i class="bi bi-collection text-success me-2"></i>
             Médias
@@ -186,8 +115,7 @@
           </h6>
           <a href="{% url 'backoffice:media_create' form.instance.pk %}"
              class="btn btn-bo-primary btn-sm">
-            <i class="bi bi-plus-lg me-1"></i>
-            Ajouter des médias
+            <i class="bi bi-plus-lg me-1"></i>Ajouter des médias
           </a>
         </div>
       </div>
@@ -203,9 +131,8 @@
                      class="w-100 h-100"
                      style="object-fit:cover;"/>
               {% else %}
-                <div class="bg-dark w-100 h-100
-                            d-flex align-items-center
-                            justify-content-center">
+                <div class="bg-dark w-100 h-100 d-flex
+                            align-items-center justify-content-center">
                   <i class="bi bi-play-circle text-white"></i>
                 </div>
               {% endif %}
@@ -227,15 +154,13 @@
         {% endwith %}
       </div>
     </div>
+
     {% else %}
-    <!-- Message avant création -->
     <div class="card border-0 shadow-sm p-4 mb-4
-                d-flex align-items-center
-                justify-content-center"
+                d-flex align-items-center justify-content-center"
          style="min-height:180px;">
       <div class="text-center text-muted">
-        <i class="bi bi-images"
-           style="font-size:3rem;opacity:0.3;"></i>
+        <i class="bi bi-images" style="font-size:3rem;opacity:0.3;"></i>
         <p class="mt-3 mb-0 small">
           Enregistrez d'abord l'album,<br/>
           puis ajoutez vos photos et vidéos.
@@ -244,26 +169,23 @@
     </div>
     {% endif %}
 
-    <!-- Conseils -->
     <div class="card border-0 shadow-sm p-4">
       <h6 class="fw-bold mb-3">
-        <i class="bi bi-lightbulb text-warning me-2"></i>
-        Conseils
+        <i class="bi bi-lightbulb text-warning me-2"></i>Conseils
       </h6>
       <ul class="list-unstyled text-muted small mb-0">
-        >
+        <li>
           <i class="bi bi-check text-success me-1"></i>
           Chaque album doit être lié à un événement.
         </li>
         <li>
           <i class="bi bi-check text-success me-1"></i>
-          Après avoir créé l'album, ajoutez
-          vos photos et vidéos.
+          Après avoir créé l'album, cliquez sur
+          "Ajouter des médias" pour uploader vos photos.
         </li>
         <li>
           <i class="bi bi-check text-success me-1"></i>
-          L'album s'affichera sur la page
-          de l'événement concerné.
+          L'album s'affichera sur la page de l'événement.
         </li>
       </ul>
     </div>
