@@ -1,31 +1,88 @@
 {% extends "backoffice/base_bo.html" %}
 
-{% block title %}Ajouter un média – Backoffice SADAC{% endblock %}
+{% block title %}Ajouter des médias – Backoffice SADAC{% endblock %}
 
 {% block breadcrumb %}
-  <li>
+  >
     <a href="{% url 'backoffice:gallery_list' %}">Galerie</a>
   </li>
-  <li>
+  >
     <a href="{% url 'backoffice:gallery_update' gallery.pk %}">
       {{ gallery.title }}
     </a>
   </li>
-  <li>Ajouter un média</li>
+  >Ajouter des médias</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .drop-zone {
+    border: 2px dashed #2E7D32;
+    background: rgba(46,125,50,0.03);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    border-radius: 12px;
+    padding: 35px 20px;
+    text-align: center;
+  }
+  .drop-zone:hover,
+  .drop-zone.drop-active {
+    background: rgba(46,125,50,0.10);
+    border-color: #FFA000;
+  }
+  .preview-item {
+    position: relative;
+    width: 75px;
+    height: 75px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+  }
+  .preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .preview-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(239,68,68,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    color: white;
+    font-size: 0.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+  #previewGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="bo-page-header">
   <div>
     <h4>
-      <i class="bi bi-plus-circle me-2"></i>
-      Ajouter un média
+      <i class="bi bi-images me-2"></i>
+      Ajouter des médias
     </h4>
     <p class="text-muted small mb-0">
-      Album :
-      <strong>{{ gallery.title }}</strong>
-      –
-      {{ gallery.medias.count }} média(s) existant(s)
+      Album : <strong>{{ gallery.title }}</strong>
+      – {{ gallery.medias.count }} média(s) existant(s)
     </p>
   </div>
   <a href="{% url 'backoffice:gallery_update' gallery.pk %}"
@@ -36,49 +93,44 @@
 
 <div class="row g-4">
 
-  <!-- Formulaire -->
+  <!-- ===== FORMULAIRE ===== -->
   <div class="col-lg-6">
     <div class="card bo-form-card">
       <div class="card-header">
         <h6 class="mb-0 fw-bold">
-          <i class="bi bi-upload me-2"></i>
-          Informations du média
+          <i class="bi bi-upload me-2"></i>Upload de médias
         </h6>
       </div>
       <div class="card-body p-4">
-        <form method="post" enctype="multipart/form-data"
+        <form method="post"
+              enctype="multipart/form-data"
               id="mediaForm">
           {% csrf_token %}
           <div class="row g-3">
 
             <!-- Type -->
             <div class="col-12">
-              <label class="form-label fw-semibold small">
-                Type de média <span class="text-danger">*</span>
+              abel class="form-label fw-semibold small">
+                Type <span class="text-danger">*</span>
               </label>
-              <div class="d-flex gap-3">
-                <div class="form-check form-check-inline">
+              <div class="d-flex gap-4">
+                <div class="form-check">
                   <input class="form-check-input"
-                         type="radio"
-                         name="type"
-                         id="typeImage"
-                         value="image"
-                         checked
-                         onchange="toggleMediaType()"/>
-                  <label class="form-check-label fw-semibold"
+                         type="radio" name="type"
+                         id="typeImage" value="image"
+                         checked onchange="toggleType()"/>
+                  abel class="form-check-label fw-semibold"
                          for="typeImage">
-                    <i class="bi bi-image text-success me-1"></i>
-                    Image / Photo
+                    <i class="bi bi-images text-success me-1"></i>
+                    Photos (multiple)
                   </label>
                 </div>
-                <div class="form-check form-check-inline">
+                <div class="form-check">
                   <input class="form-check-input"
-                         type="radio"
-                         name="type"
-                         id="typeVideo"
-                         value="video"
-                         onchange="toggleMediaType()"/>
-                  <label class="form-check-label fw-semibold"
+                         type="radio" name="type"
+                         id="typeVideo" value="video"
+                         onchange="toggleType()"/>
+                  abel class="form-check-label fw-semibold"
                          for="typeVideo">
                     <i class="bi bi-play-circle text-primary me-1"></i>
                     Vidéo
@@ -87,92 +139,93 @@
               </div>
             </div>
 
-            <!-- Fichier image -->
+            <!-- Zone upload images -->
             <div class="col-12" id="imageField">
-              <label class="form-label fw-semibold small">
-                Fichier image <span class="text-danger">*</span>
-              </label>
-              <input type="file"
-                     name="file"
-                     id="imageInput"
-                     class="form-control"
-                     accept="image/*"/>
-              <div class="form-text">
-                Formats : JPG, PNG, WEBP.
-                Taille max recommandée : 2 Mo.
+              <div id="dropZone"
+                   class="drop-zone"
+                   onclick="document.getElementById('fileInput').click()"
+                   ondragover="event.preventDefault();this.classList.add('drop-active')"
+                   ondragleave="this.classList.remove('drop-active')"
+                   ondrop="handleDrop(event)">
+                <i class="bi bi-cloud-upload text-success"
+                   style="font-size:2.5rem;"></i>
+                <h6 class="fw-bold mt-2 mb-1">
+                  Glissez vos photos ici
+                </h6>
+                <p class="text-muted small mb-2">
+                  ou cliquez pour sélectionner
+                </p>
+                <span class="badge bg-success px-3 py-1">
+                  <i class="bi bi-images me-1"></i>
+                  Sélection multiple
+                </span>
+                <div class="text-muted small mt-2">
+                  JPG · PNG · WEBP · max 10 Mo/image
+                </div>
               </div>
 
-              <!-- Aperçu image -->
-              <div id="imagePreviewContainer"
-                   class="mt-3" style="display:none;">
-                <img id="imagePreview"
-                     src="" alt="Aperçu"
-                     class="img-fluid rounded-3 shadow-sm"
-                     style="max-height:200px;
-                            object-fit:cover;"/>
-              </div>
+              <input type="file" name="file"
+                     id="fileInput" multiple
+                     accept="image/*"
+                     class="d-none"/>
+
+              <div id="sizeErrors" class="mt-2"></div>
+              <div id="fileCount"
+                   class="mt-2 small fw-semibold text-success"
+                   style="display:none;"></div>
+              <div id="previewGrid" style="display:none;"></div>
             </div>
 
             <!-- URL vidéo -->
             <div class="col-12" id="videoField"
                  style="display:none;">
-              <label class="form-label fw-semibold small">
-                URL de la vidéo <span class="text-danger">*</span>
+              abel class="form-label fw-semibold small">
+                URL YouTube / Facebook
+                <span class="text-danger">*</span>
               </label>
               <div class="input-group">
                 <span class="input-group-text">
                   <i class="bi bi-link-45deg text-muted"></i>
                 </span>
-                <input type="url"
-                       name="url"
-                       id="videoUrl"
+                <input type="url" name="url" id="videoUrl"
                        class="form-control"
                        placeholder="https://www.youtube.com/watch?v=..."/>
               </div>
-              <div class="form-text">
-                Collez le lien YouTube ou Facebook de la vidéo.
-              </div>
-
-              <!-- Aperçu vidéo YouTube -->
-              <div id="videoPreviewContainer"
+              <div id="videoPreviewBox"
                    class="mt-3 ratio ratio-16x9 rounded-3 overflow-hidden"
-                   style="display:none;max-width:400px;">
-                <iframe id="videoPreview"
-                        src=""
+                   style="display:none; max-width:380px;">
+                <iframe id="videoFrame" src=""
                         allowfullscreen></iframe>
               </div>
             </div>
 
             <!-- Légende -->
             <div class="col-12">
-              <label class="form-label fw-semibold small">
+              abel class="form-label fw-semibold small">
                 Légende
                 <span class="text-muted fw-normal">(optionnel)</span>
               </label>
               <input type="text" name="caption"
-                     value="{{ form.caption.value|default:'' }}"
                      class="form-control"
-                     placeholder="Description courte du média"/>
+                     placeholder="S'applique à tous les médias uploadés"/>
             </div>
 
             <!-- Ordre -->
             <div class="col-md-4">
-              <label class="form-label fw-semibold small">
-                Ordre d'affichage
+              abel class="form-label fw-semibold small">
+                Ordre
               </label>
               <input type="number" name="order"
-                     value="{{ form.order.value|default:'0' }}"
-                     class="form-control"
-                     min="0"/>
-              <div class="form-text">0 = premier affiché.</div>
+                     value="0" min="0"
+                     class="form-control"/>
             </div>
 
             <!-- Boutons -->
             <div class="col-12 pt-2 d-flex gap-2">
-              <button type="submit"
+              <button type="submit" id="submitBtn"
                       class="btn btn-bo-primary px-5">
-                <i class="bi bi-check-lg me-2"></i>
-                Ajouter le média
+                <i class="bi bi-upload me-2"></i>
+                <span id="submitLabel">Ajouter les photos</span>
               </button>
               <a href="{% url 'backoffice:gallery_update' gallery.pk %}"
                  class="btn btn-outline-secondary px-4">
@@ -186,7 +239,7 @@
     </div>
   </div>
 
-  <!-- Sidebar : médias existants -->
+  <!-- ===== SIDEBAR ===== -->
   <div class="col-lg-6">
 
     <!-- Conseils -->
@@ -196,100 +249,69 @@
         Conseils
       </h6>
       <ul class="list-unstyled text-muted small mb-0">
-        <li>
+        >
           <i class="bi bi-check text-success me-1"></i>
-          Pour les <strong>photos</strong> : uploadez directement
-          le fichier image.
+          Glissez plusieurs photos d'un coup.
         </li>
-        <li>
+        >
           <i class="bi bi-check text-success me-1"></i>
-          Pour les <strong>vidéos</strong> : copiez le lien
-          YouTube ou Facebook.
+          Max 10 Mo par image.
         </li>
-        <li>
+        >
           <i class="bi bi-check text-success me-1"></i>
-          Utilisez l'ordre pour contrôler la position
-          d'affichage dans l'album.
+          Pour les vidéos, collez le lien YouTube/Facebook.
         </li>
-        <li>
+        >
           <i class="bi bi-check text-success me-1"></i>
-          Ajoutez une légende pour décrire chaque photo.
-        </li>
-        <li>
-          <i class="bi bi-check text-success me-1"></i>
-          Compressez vos images avant de les uploader
-          pour un chargement plus rapide.
+          Cliquez sur <i class="bi bi-x-circle text-danger"></i>
+          pour retirer une photo avant envoi.
         </li>
       </ul>
     </div>
 
-    <!-- Médias existants dans l'album -->
+    <!-- Médias existants -->
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
-        <div class="d-flex align-items-center
-                    justify-content-between">
-          <h6 class="fw-bold mb-0">
-            <i class="bi bi-collection text-success me-2"></i>
-            Médias dans cet album
-            <span class="badge bg-success ms-1">
-              {{ gallery.medias.count }}
-            </span>
-          </h6>
-        </div>
+        <h6 class="fw-bold mb-0">
+          <i class="bi bi-collection text-success me-2"></i>
+          Médias dans l'album
+          <span class="badge bg-success ms-1">
+            {{ gallery.medias.count }}
+          </span>
+        </h6>
       </div>
       <div class="card-body p-4">
         {% with medias=gallery.medias.all %}
         {% if medias %}
-          <div class="row g-2">
+          <div class="d-flex flex-wrap gap-2">
             {% for media in medias %}
-            <div class="col-4">
-              <div class="card border-0 shadow-sm
-                          overflow-hidden position-relative">
-                {% if media.type == 'image' and media.file %}
-                  <img src="{{ media.file.url }}"
-                       alt="{{ media.caption|default:'Photo' }}"
-                       style="height:90px;
-                              object-fit:cover;
-                              width:100%;"/>
-                {% elif media.type == 'video' %}
-                  <div class="d-flex align-items-center
-                              justify-content-center bg-dark"
-                       style="height:90px;">
-                    <i class="bi bi-play-circle text-white fs-2"></i>
-                  </div>
-                {% endif %}
-
-                <!-- Badge type -->
-                <span class="position-absolute top-0 start-0 m-1
-                             badge
-                             {% if media.type == 'image' %}
-                               bg-success
-                             {% else %}
-                               bg-primary
-                             {% endif %}"
-                      style="font-size:0.6rem;">
-                  {{ media.type|capfirst }}
-                </span>
-
-                <!-- Supprimer -->
-                <a href="{% url 'backoffice:media_delete' media.pk %}"
-                   class="position-absolute top-0 end-0 m-1
-                          btn btn-danger btn-sm py-0 px-1"
-                   style="font-size:0.7rem;"
-                   onclick="return confirm('Supprimer ce média ?')"
-                   title="Supprimer">
-                  <i class="bi bi-x-lg"></i>
-                </a>
-
-                {% if media.caption %}
-                  <div class="p-1 bg-white">
-                    <p class="mb-0 text-muted"
-                       style="font-size:0.65rem;">
-                      {{ media.caption|truncatewords:4 }}
-                    </p>
-                  </div>
-                {% endif %}
-              </div>
+            <div class="position-relative rounded overflow-hidden"
+                 style="width:70px;height:70px;">
+              {% if media.type == 'image' and media.file %}
+                <img src="{{ media.file.url }}"
+                     class="w-100 h-100"
+                     style="object-fit:cover;"/>
+              {% else %}
+                <div class="bg-dark w-100 h-100 d-flex
+                            align-items-center
+                            justify-content-center">
+                  <i class="bi bi-play-circle text-white"></i>
+                </div>
+              {% endif %}
+              <span class="position-absolute top-0 start-0
+                           badge m-1
+                           {% if media.type == 'image' %}bg-success
+                           {% else %}bg-primary{% endif %}"
+                    style="font-size:0.55rem;">
+                {{ media.type|capfirst }}
+              </span>
+              <a href="{% url 'backoffice:media_delete' media.pk %}"
+                 class="position-absolute top-0 end-0 m-1
+                        btn btn-danger py-0 px-1"
+                 style="font-size:0.6rem;"
+                 onclick="return confirm('Supprimer ?')">
+                <i class="bi bi-x"></i>
+              </a>
             </div>
             {% endfor %}
           </div>
@@ -297,7 +319,7 @@
           <div class="bo-empty py-3">
             <i class="bi bi-collection"
                style="font-size:2rem;"></i>
-            <p class="small">Aucun média encore.</p>
+            <p class="small">Aucun média pour le moment.</p>
           </div>
         {% endif %}
         {% endwith %}
@@ -310,51 +332,238 @@
 
 {% block extra_js %}
 <script>
-  // Basculer entre image et vidéo
-  function toggleMediaType() {
-    const isImage = document.getElementById('typeImage').checked;
+(function () {
+  var MAX_SIZE      = 10 * 1024 * 1024;
+  var selectedFiles = [];
+
+  /* ---- TOGGLE ---- */
+  window.toggleType = function () {
+    var isImg = document.getElementById('typeImage').checked;
     document.getElementById('imageField').style.display =
-      isImage ? 'block' : 'none';
+      isImg ? 'block' : 'none';
     document.getElementById('videoField').style.display =
-      isImage ? 'none' : 'block';
-    // Reset aperçus
-    document.getElementById('imagePreviewContainer').style.display = 'none';
-    document.getElementById('videoPreviewContainer').style.display = 'none';
+      isImg ? 'none' : 'block';
+    document.getElementById('submitLabel').textContent =
+      isImg ? 'Ajouter les photos' : 'Ajouter la vidéo';
+  };
+
+  /* ---- DRAG & DROP ---- */
+  window.handleDrop = function (e) {
+    e.preventDefault();
+    document.getElementById('dropZone')
+      .classList.remove('drop-active');
+    addFiles(e.dataTransfer.files);
+  };
+
+  /* ---- INPUT FILE ---- */
+  document.getElementById('fileInput')
+    .addEventListener('change', function () {
+      addFiles(this.files);
+      this.value = '';
+    });
+
+  /* ---- AJOUTER FICHIERS ---- */
+  function addFiles(files) {
+    var errors = [];
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      if (!f.type.startsWith('image/')) {
+        errors.push(f.name + ' : format non supporté.');
+        continue;
+      }
+      if (f.size > MAX_SIZE) {
+        errors.push(f.name + ' : dépasse 10 Mo.');
+        continue;
+      }
+      var exists = selectedFiles.some(function (sf) {
+        return sf.name === f.name && sf.size === f.size;
+      });
+      if (!exists) selectedFiles.push(f);
+    }
+    showErrors(errors);
+    renderPreview();
   }
 
-  // Aperçu image
-  document.getElementById('imageInput')
-    .addEventListener('change', function (e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
+  /* ---- SUPPRIMER ---- */
+  window.removeFile = function (index) {
+    selectedFiles.splice(index, 1);
+    renderPreview();
+  };
+
+  /* ---- APERÇU GRILLE ---- */
+  function renderPreview() {
+    var grid    = document.getElementById('previewGrid');
+    var counter = document.getElementById('fileCount');
+    grid.innerHTML = '';
+
+    if (selectedFiles.length === 0) {
+      grid.style.display    = 'none';
+      counter.style.display = 'none';
+      updateBtn(0);
+      return;
+    }
+
+    grid.style.display    = 'flex';
+    counter.style.display = 'block';
+
+    var total = selectedFiles.reduce(function (a, f) {
+      return a + f.size;
+    }, 0);
+    counter.innerHTML =
+      '<i class="bi bi-images me-1"></i><strong>' +
+      selectedFiles.length + '</strong> photo(s) – ' +
+      (total / 1024 / 1024).toFixed(1) + ' Mo total';
+
+    selectedFiles.forEach(function (file, idx) {
+      var reader = new FileReader();
       reader.onload = function (ev) {
-        document.getElementById('imagePreview').src = ev.target.result;
-        document.getElementById('imagePreviewContainer')
-          .style.display = 'block';
+
+        var item      = document.createElement('div');
+        item.className = 'preview-item';
+
+        var img    = document.createElement('img');
+        img.src    = ev.target.result;
+        img.alt    = file.name;
+
+        var btn    = document.createElement('button');
+        btn.type   = 'button';
+        btn.className = 'preview-remove';
+        btn.title  = 'Retirer';
+        btn.innerHTML = '<i class="bi bi-x-lg"></i>';
+        btn.setAttribute('data-idx', idx);
+        btn.addEventListener('click', function () {
+          removeFile(parseInt(this.getAttribute('data-idx')));
+        });
+
+        item.appendChild(img);
+        item.appendChild(btn);
+        grid.appendChild(item);
       };
       reader.readAsDataURL(file);
     });
 
-  // Aperçu vidéo YouTube
-  document.getElementById('videoUrl')
-    .addEventListener('change', function () {
-      const url = this.value;
-      let embedUrl = '';
+    updateBtn(selectedFiles.length);
+  }
 
-      if (url.includes('youtube.com/watch?v=')) {
-        const videoId = url.split('v=')[1].split('&')[0];
-        embedUrl = `https://www.youtube.com/embed/${videoId}`;
-      } else if (url.includes('youtu.be/')) {
-        const videoId = url.split('youtu.be/')[1].split('?')[0];
-        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+  /* ---- LABEL BOUTON ---- */
+  function updateBtn(count) {
+    var label = document.getElementById('submitLabel');
+    var isImg = document.getElementById('typeImage').checked;
+    if (!isImg) { label.textContent = 'Ajouter la vidéo'; return; }
+    label.textContent = count > 0
+      ? 'Ajouter ' + count + ' photo(s)'
+      : 'Ajouter les photos';
+  }
+
+  /* ---- ERREURS ---- */
+  function showErrors(errors) {
+    var box = document.getElementById('sizeErrors');
+    if (!box) return;
+    if (!errors || errors.length === 0) {
+      box.innerHTML = ''; return;
+    }
+    box.innerHTML =
+      '<div class="alert alert-warning alert-dismissible py-2 mt-2">' +
+      '<strong><i class="bi bi-exclamation-triangle me-1"></i>' +
+      'Fichiers ignorés :</strong><ul class="mb-0 mt-1 small">' +
+      errors.map(function (e) {
+        return '>' + e + '</li>';
+      }).join('') +
+      '</ul><button type="button" class="btn-close"' +
+      ' data-bs-dismiss="alert"></button></div>';
+  }
+
+  /* ---- APERÇU VIDÉO ---- */
+  document.getElementById('videoUrl')
+    .addEventListener('input', function () {
+      var url   = this.value.trim();
+      var embed = '';
+      var box   = document.getElementById('videoPreviewBox');
+      var frame = document.getElementById('videoFrame');
+
+      if (url.indexOf('youtube.com/watch?v=') !== -1) {
+        embed = 'https://www.youtube.com/embed/' +
+          url.split('v=')[1].split('&')[0];
+      } else if (url.indexOf('youtu.be/') !== -1) {
+        embed = 'https://www.youtube.com/embed/' +
+          url.split('youtu.be/')[1].split('?')[0];
+      } else if (url.indexOf('facebook.com') !== -1) {
+        embed = 'https://www.facebook.com/plugins/video.php?href=' +
+          encodeURIComponent(url);
       }
 
-      if (embedUrl) {
-        document.getElementById('videoPreview').src = embedUrl;
-        document.getElementById('videoPreviewContainer')
-          .style.display = 'block';
+      if (embed) {
+        frame.src = embed;
+        box.style.display = 'block';
+      } else {
+        box.style.display = 'none';
+        frame.src = '';
       }
     });
+
+  /* ---- ENVOI FETCH + FORMDATA ---- */
+  document.getElementById('mediaForm')
+    .addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var isImg = document.getElementById('typeImage').checked;
+
+      if (!isImg) {
+        var url = document.getElementById('videoUrl').value.trim();
+        if (!url) { alert('Veuillez entrer une URL de vidéo.'); return; }
+        this.submit();
+        return;
+      }
+
+      if (selectedFiles.length === 0) {
+        alert('Veuillez sélectionner au moins une photo.');
+        return;
+      }
+
+      var fd = new FormData(this);
+      fd.delete('file');
+      selectedFiles.forEach(function (f) {
+        fd.append('file', f, f.name);
+      });
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"' +
+        ' role="status"></span>Upload de ' +
+        selectedFiles.length + ' photo(s)...';
+
+      fetch(window.location.href, {
+        method: 'POST',
+        body:   fd,
+        headers: {
+          'X-CSRFToken': document.querySelector(
+            '[name=csrfmiddlewaretoken]').value
+        }
+      })
+      .then(function (resp) {
+        if (resp.redirected) {
+          window.location.href = resp.url;
+        } else if (resp.ok) {
+          window.location.reload();
+        } else {
+          btn.disabled = false;
+          btn.innerHTML =
+            '<i class="bi bi-upload me-2"></i>' +
+            '<span id="submitLabel">Réessayer</span>';
+          alert('Erreur upload. Réessayez.');
+        }
+      })
+      .catch(function (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML =
+          '<i class="bi bi-upload me-2"></i>' +
+          '<span id="submitLabel">Réessayer</span>';
+        alert('Erreur réseau.');
+      });
+    });
+
+})();
 </script>
 {% endblock %}
