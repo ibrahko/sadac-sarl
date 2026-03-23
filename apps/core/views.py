@@ -29,7 +29,33 @@ class ContactView(FormView):
     form_class = ContactForm
     success_url = reverse_lazy("core:contact")
 
+    def _get_client_ip(self, request):
+        x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded:
+            return x_forwarded.split(',')[0].strip()
+        return request.META.get('REMOTE_ADDR', '0.0.0.0')
+
+    def dispatch(self, request, *args, **kwargs):
+        # Rate limit : max 3 soumissions par IP par heure
+        if request.method == 'POST':
+            ip        = self._get_client_ip(request)
+            cache_key = f"contact_limit_{ip}"
+            count     = cache.get(cache_key, 0)
+            if count >= 3:
+                return HttpResponseTooManyRequests(
+                    "Trop de messages envoyés. "
+                    "Veuillez réessayer dans une heure.",
+                    content_type="text/plain"
+                )
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
+        # Incrémenter le compteur IP
+        ip        = self._get_client_ip(self.request)
+        cache_key = f"contact_limit_{ip}"
+        count     = cache.get(cache_key, 0)
+        cache.set(cache_key, count + 1, timeout=3600)
+        
         form.save()          # crée ContactMessage
         form.send_email()    # mail à SADAC
         # Si la case newsletter est cochée

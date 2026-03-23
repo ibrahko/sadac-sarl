@@ -78,6 +78,16 @@
           </div>
         </div>
 
+        <!-- Honeypot anti-spam : invisible pour les humains -->
+        <!-- Honeypot anti-spam -->
+      <div class="d-none">
+      <input type="text"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+            value=""/>
+      </div>
+
         <!-- Email -->
         <div class="d-flex gap-3 mb-4">
           <div class="flex-shrink-0">
@@ -94,7 +104,13 @@
               {{ site_settings.email|default:"contact@sadac.ml" }}
             </a>
           </div>
-        </div>
+        </  position:absolute;
+          left:-9999px;">
+          <input type="text"
+          name="website"
+          tabindex="-1"
+          autocomplete="off"
+        div>
 
         <!-- WhatsApp -->
         {% if site_settings and site_settings.whatsapp %}
