@@ -6,14 +6,16 @@
   <li>
     <a href="{% url 'backoffice:post_list' %}">Articles</a>
   </li>
-  >{{ title }}</li>
+  <li>{{ title }}</li>
 {% endblock %}
 
 {% block content %}
 <div class="bo-page-header">
   <div>
     <h4><i class="bi bi-pencil-square me-2"></i>{{ title }}</h4>
-    <p class="text-muted small mb-0">Rédigez et publiez votre article</p>
+    <p class="text-muted small mb-0">
+      Rédigez et publiez votre article
+    </p>
   </div>
   <a href="{% url 'backoffice:post_list' %}"
      class="btn btn-outline-secondary btn-sm">
@@ -23,16 +25,18 @@
 
 <div class="row g-4">
 
-  <!-- Formulaire principal -->
+  <!-- ===== FORMULAIRE ===== -->
   <div class="col-lg-8">
     <div class="card bo-form-card">
       <div class="card-header">
         <h6 class="mb-0 fw-bold">
-          <i class="bi bi-file-text me-2"></i>Contenu de l'article
+          <i class="bi bi-file-text me-2"></i>
+          Contenu de l'article
         </h6>
       </div>
       <div class="card-body p-4">
-        <form method="post" enctype="multipart/form-data"
+        <form method="post"
+              enctype="multipart/form-data"
               id="postForm">
           {% csrf_token %}
           <div class="row g-3">
@@ -89,24 +93,35 @@
                 </div>
               {% endif %}
               <input type="file" name="image"
+                     id="imageInput"
                      class="form-control"
                      accept="image/*"/>
               <div class="form-text">
-                Formats : JPG, PNG, WEBP. Taille max : 2 Mo.
+                Formats : JPG, PNG, WEBP. Taille max : 10 Mo.
               </div>
+              <!-- Infos fichier sélectionné -->
+              <p id="fileInfo"
+                 class="text-muted small mt-1 mb-0"
+                 style="display:none;"></p>
             </div>
 
             <!-- Boutons -->
             <div class="col-12 pt-2 d-flex gap-3">
-              <button type="submit" name="action"
+              <button type="submit"
+                      id="submitBtn"
+                      name="action"
                       value="save"
                       class="btn btn-bo-primary px-5">
-                <i class="bi bi-check-lg me-2"></i>{{ btn_label }}
+                <i class="bi bi-check-lg me-2"></i>
+                {{ btn_label }}
               </button>
-              <button type="submit" name="action"
+              <button type="submit"
+                      id="draftBtn"
+                      name="action"
                       value="draft"
                       class="btn btn-outline-secondary px-4">
-                <i class="bi bi-save me-2"></i>Enregistrer brouillon
+                <i class="bi bi-save me-2"></i>
+                Enregistrer brouillon
               </button>
             </div>
 
@@ -116,7 +131,7 @@
     </div>
   </div>
 
-  <!-- Sidebar options -->
+  <!-- ===== SIDEBAR ===== -->
   <div class="col-lg-4 d-flex flex-column gap-4">
 
     <!-- Publication -->
@@ -125,9 +140,11 @@
         <i class="bi bi-send text-success me-2"></i>
         Publication
       </h6>
-
-      <label class="form-label fw-semibold small">Statut</label>
-      <select name="status" form="postForm" class="form-select mb-3">
+      <label class="form-label fw-semibold small">
+        Statut
+      </label>
+      <select name="status" form="postForm"
+              class="form-select mb-3">
         <option value="draft"
           {% if form.status.value == 'draft' or not form.status.value %}
             selected{% endif %}>
@@ -138,7 +155,6 @@
           Publié
         </option>
       </select>
-
       <label class="form-label fw-semibold small">
         Date de publication
       </label>
@@ -148,9 +164,8 @@
              value="{{ form.published_at.value|default:'' }}"
              class="form-control mb-3"/>
       <div class="form-text mb-3">
-        Laissez vide pour utiliser la date actuelle lors de la publication.
+        Laissez vide pour utiliser la date actuelle.
       </div>
-
       <button type="submit" form="postForm"
               class="btn btn-bo-primary w-100">
         <i class="bi bi-send me-2"></i>{{ btn_label }}
@@ -164,16 +179,18 @@
         Aperçu image
       </h6>
       <div id="imagePreview"
-           class="rounded-3 bg-light d-flex align-items-center
-                  justify-content-center overflow-hidden"
+           class="rounded-3 bg-light d-flex
+                  align-items-center justify-content-center
+                  overflow-hidden"
            style="height:160px;">
         {% if form.instance.image %}
           <img src="{{ form.instance.image.url }}"
+               id="previewImg"
                class="w-100 h-100"
-               style="object-fit:cover;"
-               id="previewImg"/>
+               style="object-fit:cover;"/>
         {% else %}
-          <div class="text-center text-muted" id="previewPlaceholder">
+          <div class="text-center text-muted"
+               id="previewPlaceholder">
             <i class="bi bi-image fs-1"></i>
             <p class="small mt-2 mb-0">Aperçu de l'image</p>
           </div>
@@ -213,21 +230,58 @@
 
 {% block extra_js %}
 <script>
-  // Aperçu image avant upload
-  document.querySelector('input[name="image"]')
-    .addEventListener('change', function(e) {
-      const file = e.target.files[0];
+  var MAX_SIZE = 10 * 1024 * 1024; // 10 Mo
+
+  /* ---- APERÇU IMAGE + VALIDATION TAILLE ---- */
+  document.getElementById('imageInput')
+    .addEventListener('change', function (e) {
+      var file = e.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(ev) {
-        const preview = document.getElementById('imagePreview');
-        preview.innerHTML = `
-          <img src="${ev.target.result}"
-               class="w-100 h-100"
-               style="object-fit:cover;"
-               id="previewImg"/>`;
+
+      if (file.size > MAX_SIZE) {
+        alert(
+          file.name + ' dépasse 10 Mo (' +
+          (file.size / 1024 / 1024).toFixed(1) +
+          ' Mo). Veuillez choisir une image plus petite.'
+        );
+        this.value = '';
+        document.getElementById('imagePreview')
+          .innerHTML =
+          '<div class="text-center text-muted">' +
+          '<i class="bi bi-image fs-1"></i>' +
+          '<p class="small mt-2 mb-0">Aperçu de l\'image</p>' +
+          '</div>';
+        document.getElementById('fileInfo')
+          .style.display = 'none';
+        return;
+      }
+
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('imagePreview').innerHTML =
+          '<img src="' + ev.target.result + '"' +
+          ' id="previewImg" class="w-100 h-100"' +
+          ' style="object-fit:cover;"/>';
+        var info = document.getElementById('fileInfo');
+        info.textContent =
+          file.name + ' – ' +
+          (file.size / 1024 / 1024).toFixed(1) + ' Mo';
+        info.style.display = 'block';
       };
       reader.readAsDataURL(file);
+    });
+
+  /* ---- SPINNER SUBMIT ---- */
+  document.getElementById('postForm')
+    .addEventListener('submit', function (e) {
+      var clicked = document.activeElement;
+      var btn = document.getElementById('submitBtn');
+      var draftBtn = document.getElementById('draftBtn');
+      btn.disabled    = true;
+      draftBtn.disabled = true;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"' +
+        ' role="status"></span>Enregistrement...';
     });
 </script>
 {% endblock %}

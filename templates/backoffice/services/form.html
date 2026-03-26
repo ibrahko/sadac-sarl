@@ -6,7 +6,7 @@
   <li>
     <a href="{% url 'backoffice:service_list' %}">Services</a>
   </li>
-  >{{ title }}</li>
+  <li>{{ title }}</li>
 {% endblock %}
 
 {% block content %}
@@ -25,7 +25,6 @@
 
 <div class="row g-4">
 
-  <!-- Formulaire principal -->
   <div class="col-lg-8">
     <div class="card bo-form-card">
       <div class="card-header">
@@ -35,11 +34,12 @@
         </h6>
       </div>
       <div class="card-body p-4">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post"
+              enctype="multipart/form-data"
+              id="serviceForm">
           {% csrf_token %}
           <div class="row g-3">
 
-            <!-- Titre -->
             <div class="col-md-8">
               <label class="form-label fw-semibold small">
                 Titre <span class="text-danger">*</span>
@@ -51,7 +51,6 @@
                      required/>
             </div>
 
-            <!-- Ordre -->
             <div class="col-md-4">
               <label class="form-label fw-semibold small">
                 Ordre d'affichage
@@ -62,7 +61,6 @@
                      min="0"/>
             </div>
 
-            <!-- Résumé -->
             <div class="col-12">
               <label class="form-label fw-semibold small">
                 Résumé court <span class="text-danger">*</span>
@@ -77,7 +75,6 @@
               </div>
             </div>
 
-            <!-- Description complète -->
             <div class="col-12">
               <label class="form-label fw-semibold small">
                 Description complète <span class="text-danger">*</span>
@@ -89,7 +86,6 @@
                         required>{{ form.description.value|default:'' }}</textarea>
             </div>
 
-            <!-- Icône -->
             <div class="col-md-6">
               <label class="form-label fw-semibold small">
                 Icône Bootstrap Icons
@@ -106,7 +102,6 @@
                        placeholder="Ex: lightbulb, tree, people"/>
               </div>
               <div class="form-text">
-                Noms d'icônes disponibles sur
                 <a href="https://icons.getbootstrap.com"
                    target="_blank" class="text-success">
                   icons.getbootstrap.com
@@ -114,7 +109,6 @@
               </div>
             </div>
 
-            <!-- Statut -->
             <div class="col-md-6">
               <label class="form-label fw-semibold small">
                 Statut
@@ -131,7 +125,6 @@
               </select>
             </div>
 
-            <!-- Image -->
             <div class="col-12">
               <label class="form-label fw-semibold small">
                 Image illustrative
@@ -145,17 +138,27 @@
                 </div>
               {% endif %}
               <input type="file" name="image"
+                     id="imageInput"
                      class="form-control"
                      accept="image/*"/>
               <div class="form-text">
-                Formats : JPG, PNG, WEBP. Taille max : 2 Mo.
+                Formats : JPG, PNG, WEBP. Taille max : 10 Mo.
+              </div>
+              <div id="imagePreview" class="mt-2"
+                   style="display:none;">
+                <img id="previewImg" src="" alt="Aperçu"
+                     class="rounded-3 shadow-sm"
+                     style="max-height:150px; object-fit:cover;"/>
+                <p id="fileInfo"
+                   class="text-muted small mt-1 mb-0"></p>
               </div>
             </div>
 
-            <!-- Bouton -->
             <div class="col-12 pt-2">
-              <button type="submit" class="btn btn-bo-primary px-5">
-                <i class="bi bi-check-lg me-2"></i>{{ btn_label }}
+              <button type="submit" id="submitBtn"
+                      class="btn btn-bo-primary px-5">
+                <i class="bi bi-check-lg me-2"></i>
+                {{ btn_label }}
               </button>
             </div>
 
@@ -165,7 +168,6 @@
     </div>
   </div>
 
-  <!-- Sidebar -->
   <div class="col-lg-4">
     <div class="card border-0 shadow-sm p-4">
       <h6 class="fw-bold mb-3">
@@ -190,107 +192,72 @@
           Cliquez sur une icône ci-dessous pour la sélectionner.
         </li>
       </ul>
-
       <hr/>
-
-      <!-- Icônes suggérées statiques -->
       <p class="small fw-semibold mb-2">
         <i class="bi bi-grid me-1"></i>Icônes suggérées :
       </p>
       <div class="d-flex flex-wrap gap-2">
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="lightbulb"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('lightbulb')">
           <i class="bi bi-lightbulb"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="mortarboard"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('mortarboard')">
           <i class="bi bi-mortarboard"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="bar-chart-line"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('bar-chart-line')">
           <i class="bi bi-bar-chart-line"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="tree"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('tree')">
           <i class="bi bi-tree"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="shop"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('shop')">
           <i class="bi bi-shop"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="people"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('people')">
           <i class="bi bi-people"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="gear"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('gear')">
           <i class="bi bi-gear"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="clipboard-check"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('clipboard-check')">
           <i class="bi bi-clipboard-check"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="patch-check"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('patch-check')">
           <i class="bi bi-patch-check"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="briefcase"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('briefcase')">
           <i class="bi bi-briefcase"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="award"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('award')">
           <i class="bi bi-award"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="tools"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('tools')">
           <i class="bi bi-tools"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="droplet"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('droplet')">
           <i class="bi bi-droplet"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="sun"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('sun')">
           <i class="bi bi-sun"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="globe"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('globe')">
           <i class="bi bi-globe"></i>
         </button>
-        <button type="button"
-                class="btn btn-sm btn-outline-success"
-                title="shield-check"
+        <button type="button" class="btn btn-sm btn-outline-success"
                 onclick="setIcon('shield-check')">
           <i class="bi bi-shield-check"></i>
         </button>
@@ -303,18 +270,55 @@
 
 {% block extra_js %}
 <script>
-  // Aperçu icône en temps réel
+  var MAX_SIZE = 10 * 1024 * 1024;
+
   document.getElementById('iconInput')
     .addEventListener('input', function () {
       document.getElementById('iconPreview').className =
         'bi bi-' + (this.value || 'patch-check');
     });
 
-  // Clic sur icône suggérée
   function setIcon(name) {
     document.getElementById('iconInput').value = name;
     document.getElementById('iconPreview').className =
       'bi bi-' + name;
   }
+
+  document.getElementById('imageInput')
+    .addEventListener('change', function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      if (file.size > MAX_SIZE) {
+        alert(
+          file.name + ' dépasse 10 Mo (' +
+          (file.size / 1024 / 1024).toFixed(1) +
+          ' Mo). Veuillez choisir une image plus petite.'
+        );
+        this.value = '';
+        document.getElementById('imagePreview')
+          .style.display = 'none';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('previewImg').src =
+          ev.target.result;
+        document.getElementById('fileInfo').textContent =
+          file.name + ' – ' +
+          (file.size / 1024 / 1024).toFixed(1) + ' Mo';
+        document.getElementById('imagePreview')
+          .style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+  document.getElementById('serviceForm')
+    .addEventListener('submit', function () {
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"' +
+        ' role="status"></span>Enregistrement...';
+    });
 </script>
 {% endblock %}

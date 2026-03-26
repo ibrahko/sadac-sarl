@@ -24,6 +24,8 @@
 </div>
 
 <div class="row g-4">
+
+  <!-- ===== FORMULAIRE ===== -->
   <div class="col-lg-8">
     <div class="card bo-form-card">
       <div class="card-header">
@@ -33,7 +35,9 @@
         </h6>
       </div>
       <div class="card-body p-4">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post"
+              enctype="multipart/form-data"
+              id="eventForm">
           {% csrf_token %}
           <div class="row g-3">
 
@@ -115,7 +119,7 @@
                         required>{{ form.description.value|default:'' }}</textarea>
             </div>
 
-            <!-- Affiche / Banner -->
+            <!-- Affiche -->
             <div class="col-12">
               <label class="form-label fw-semibold small">
                 Affiche / Bannière
@@ -129,17 +133,32 @@
                 </div>
               {% endif %}
               <input type="file" name="banner"
+                     id="bannerInput"
                      class="form-control"
                      accept="image/*"/>
               <div class="form-text">
-                Formats : JPG, PNG, WEBP. Taille max : 2 Mo.
+                Formats : JPG, PNG, WEBP. Taille max : 10 Mo.
+              </div>
+              <!-- Aperçu -->
+              <div id="bannerPreview" class="mt-2"
+                   style="display:none;">
+                <img id="previewImg" src="" alt="Aperçu"
+                     class="rounded-3 shadow-sm"
+                     style="max-height:180px;
+                            object-fit:cover;
+                            width:100%;"/>
+                <p id="fileInfo"
+                   class="text-muted small mt-1 mb-0"></p>
               </div>
             </div>
 
             <!-- Bouton -->
             <div class="col-12 pt-2">
-              <button type="submit" class="btn btn-bo-primary px-5">
-                <i class="bi bi-check-lg me-2"></i>{{ btn_label }}
+              <button type="submit"
+                      id="submitBtn"
+                      class="btn btn-bo-primary px-5">
+                <i class="bi bi-check-lg me-2"></i>
+                {{ btn_label }}
               </button>
             </div>
 
@@ -149,14 +168,14 @@
     </div>
   </div>
 
-  <!-- Sidebar -->
+  <!-- ===== SIDEBAR ===== -->
   <div class="col-lg-4">
     <div class="card border-0 shadow-sm p-4 mb-4">
       <h6 class="fw-bold mb-3">
         <i class="bi bi-lightbulb text-warning me-2"></i>
         Conseils
       </h6>
-      <ul class="list-unstyled text-muted small">
+      <ul class="list-unstyled text-muted small mb-0">
         <li>
           <i class="bi bi-check text-success me-1"></i>
           Choisissez un titre accrocheur.
@@ -167,17 +186,17 @@
         </li>
         <li>
           <i class="bi bi-check text-success me-1"></i>
-          Ajoutez une belle affiche pour attirer l'attention.
+          Ajoutez une belle affiche pour attirer
+          l'attention.
         </li>
         <li>
           <i class="bi bi-check text-success me-1"></i>
-          Après l'événement, passez le statut sur "Passé"
-          et ajoutez les photos dans la galerie.
+          Après l'événement, passez le statut sur
+          "Passé" et ajoutez les photos dans la galerie.
         </li>
       </ul>
     </div>
 
-    <!-- Lien galerie si modification -->
     {% if form.instance.pk %}
     <div class="card border-0 shadow-sm p-4">
       <h6 class="fw-bold mb-3">
@@ -197,4 +216,51 @@
 
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var MAX_SIZE = 10 * 1024 * 1024; // 10 Mo
+
+  /* ---- APERÇU AFFICHE + VALIDATION ---- */
+  document.getElementById('bannerInput')
+    .addEventListener('change', function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > MAX_SIZE) {
+        alert(
+          file.name + ' dépasse 10 Mo (' +
+          (file.size / 1024 / 1024).toFixed(1) +
+          ' Mo). Veuillez choisir une image plus petite.'
+        );
+        this.value = '';
+        document.getElementById('bannerPreview')
+          .style.display = 'none';
+        return;
+      }
+
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('previewImg').src =
+          ev.target.result;
+        document.getElementById('fileInfo').textContent =
+          file.name + ' – ' +
+          (file.size / 1024 / 1024).toFixed(1) + ' Mo';
+        document.getElementById('bannerPreview')
+          .style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+  /* ---- SPINNER SUBMIT ---- */
+  document.getElementById('eventForm')
+    .addEventListener('submit', function () {
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"' +
+        ' role="status"></span>Enregistrement...';
+    });
+</script>
 {% endblock %}

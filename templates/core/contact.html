@@ -10,14 +10,19 @@
   <div class="container">
     <h1 class="fw-bold display-5">Contactez-nous</h1>
     <p class="lead opacity-75 mt-2">
-      Notre équipe est disponible pour répondre à toutes vos questions
+      Notre équipe est disponible pour répondre
+      à toutes vos questions
     </p>
-    <nav aria-label="breadcrumb" class="justify-content-center d-flex mt-3">
+    <nav aria-label="breadcrumb"
+         class="justify-content-center d-flex mt-3">
       <ol class="breadcrumb">
         >
-          <a href="{% url 'core:home' %}" class="text-warning">Accueil</a>
+          <a href="{% url 'core:home' %}"
+             class="text-warning">Accueil</a>
         </li>
-        >Contact</li>
+        >
+          Contact
+        </li>
       </ol>
     </nav>
   </div>
@@ -37,7 +42,8 @@
         <div class="d-flex gap-3 mb-4">
           <div class="flex-shrink-0">
             <span class="bg-success bg-opacity-10 rounded-circle
-                         d-flex align-items-center justify-content-center"
+                         d-flex align-items-center
+                         justify-content-center"
                   style="width:50px;height:50px;">
               <i class="bi bi-geo-alt-fill text-success fs-5"></i>
             </span>
@@ -54,7 +60,8 @@
         <div class="d-flex gap-3 mb-4">
           <div class="flex-shrink-0">
             <span class="bg-success bg-opacity-10 rounded-circle
-                         d-flex align-items-center justify-content-center"
+                         d-flex align-items-center
+                         justify-content-center"
                   style="width:50px;height:50px;">
               <i class="bi bi-telephone-fill text-success fs-5"></i>
             </span>
@@ -63,36 +70,31 @@
             <h6 class="fw-bold mb-1">Téléphone</h6>
             {% if site_settings and site_settings.phone1 %}
               <a href="tel:{{ site_settings.phone1 }}"
-                 class="text-muted small d-block text-decoration-none">
+                 class="text-muted small d-block
+                        text-decoration-none">
                 {{ site_settings.phone1 }}
               </a>
             {% endif %}
             {% if site_settings and site_settings.phone2 %}
               <a href="tel:{{ site_settings.phone2 }}"
-                 class="text-muted small d-block text-decoration-none">
+                 class="text-muted small d-block
+                        text-decoration-none">
                 {{ site_settings.phone2 }}
               </a>
             {% else %}
-              <p class="text-muted small mb-0">+223 00 00 00 00</p>
+              <p class="text-muted small mb-0">
+                +223 00 00 00 00
+              </p>
             {% endif %}
           </div>
         </div>
-
-        <!-- Honeypot anti-spam : invisible pour les humains -->
-        <!-- Honeypot anti-spam -->
-      <div class="d-none">
-      <input type="text"
-            name="website"
-            tabindex="-1"
-            autocomplete="off"
-            value=""/>
-      </div>
 
         <!-- Email -->
         <div class="d-flex gap-3 mb-4">
           <div class="flex-shrink-0">
             <span class="bg-success bg-opacity-10 rounded-circle
-                         d-flex align-items-center justify-content-center"
+                         d-flex align-items-center
+                         justify-content-center"
                   style="width:50px;height:50px;">
               <i class="bi bi-envelope-fill text-success fs-5"></i>
             </span>
@@ -104,13 +106,7 @@
               {{ site_settings.email|default:"contact@sadac.ml" }}
             </a>
           </div>
-        </  position:absolute;
-          left:-9999px;">
-          <input type="text"
-          name="website"
-          tabindex="-1"
-          autocomplete="off"
-        div>
+        </div>
 
         <!-- WhatsApp -->
         {% if site_settings and site_settings.whatsapp %}
@@ -120,7 +116,8 @@
                          justify-content-center"
                   style="width:50px;height:50px;
                          background:rgba(37,211,102,0.1);">
-              <i class="bi bi-whatsapp fs-5" style="color:#25D366;"></i>
+              <i class="bi bi-whatsapp fs-5"
+                 style="color:#25D366;"></i>
             </span>
           </div>
           <div>
@@ -141,7 +138,8 @@
             {% if site_settings and site_settings.facebook_url %}
               <a href="{{ site_settings.facebook_url }}"
                  target="_blank"
-                 class="btn btn-outline-success btn-sm rounded-circle"
+                 class="btn btn-outline-success btn-sm
+                        rounded-circle"
                  style="width:40px;height:40px;
                         display:flex;align-items:center;
                         justify-content:center;">
@@ -151,7 +149,8 @@
             {% if site_settings and site_settings.youtube_url %}
               <a href="{{ site_settings.youtube_url }}"
                  target="_blank"
-                 class="btn btn-outline-danger btn-sm rounded-circle"
+                 class="btn btn-outline-danger btn-sm
+                        rounded-circle"
                  style="width:40px;height:40px;
                         display:flex;align-items:center;
                         justify-content:center;">
@@ -174,9 +173,11 @@
 
         <!-- Horaires -->
         <div class="card border-0 shadow-sm mt-4 p-4"
-             style="border-left: 4px solid var(--sadac-green) !important;">
+             style="border-left:4px solid
+                    var(--sadac-green) !important;">
           <h6 class="fw-bold mb-3">
-            <i class="bi bi-clock text-success me-2"></i>Horaires
+            <i class="bi bi-clock text-success me-2"></i>
+            Horaires
           </h6>
           <ul class="list-unstyled text-muted small mb-0">
             >
@@ -199,26 +200,38 @@
       <!-- ===== FORMULAIRE ===== -->
       <div class="col-lg-8">
         <div class="card border-0 shadow-sm p-4 p-lg-5">
-          <h3 class="fw-bold mb-2">Envoyez-nous un message</h3>
+          <h3 class="fw-bold mb-2">
+            Envoyez-nous un message
+          </h3>
           <div class="divider-orange mb-4"></div>
           <p class="text-muted mb-4">
-            Remplissez le formulaire ci-dessous et nous vous répondrons
-            dans les plus brefs délais.
+            Remplissez le formulaire ci-dessous et nous vous
+            répondrons dans les plus brefs délais.
           </p>
 
-          <form method="post" action="{% url 'core:contact' %}">
+          <form method="post"
+                action="{% url 'core:contact' %}">
             {% csrf_token %}
+
+            <!-- Honeypot anti-spam -->
+            <div class="d-none">
+              <input type="text"
+                     name="website"
+                     tabindex="-1"
+                     autocomplete="off"
+                     value=""/>
+            </div>
 
             <div class="row g-3">
 
               <!-- Nom -->
               <div class="col-md-6">
-                <label class="form-label fw-semibold">
+                abel class="form-label fw-semibold">
                   <i class="bi bi-person me-1 text-success"></i>
-                  Nom complet <span class="text-danger">*</span>
+                  Nom complet
+                  <span class="text-danger">*</span>
                 </label>
-                <input type="text"
-                       name="name"
+                <input type="text" name="name"
                        class="form-control"
                        placeholder="Votre nom et prénom"
                        required/>
@@ -226,24 +239,23 @@
 
               <!-- Email -->
               <div class="col-md-6">
-                <label class="form-label fw-semibold">
+                abel class="form-label fw-semibold">
                   <i class="bi bi-envelope me-1 text-success"></i>
                   Email
                 </label>
-                <input type="email"
-                       name="email"
+                <input type="email" name="email"
                        class="form-control"
                        placeholder="votre@email.com"/>
               </div>
 
               <!-- Téléphone -->
               <div class="col-md-6">
-                <label class="form-label fw-semibold">
+                abel class="form-label fw-semibold">
                   <i class="bi bi-telephone me-1 text-success"></i>
-                  Téléphone <span class="text-danger">*</span>
+                  Téléphone
+                  <span class="text-danger">*</span>
                 </label>
-                <input type="tel"
-                       name="phone"
+                <input type="tel" name="phone"
                        class="form-control"
                        placeholder="+223 00 00 00 00"
                        required/>
@@ -251,11 +263,12 @@
 
               <!-- Sujet -->
               <div class="col-md-6">
-                <label class="form-label fw-semibold">
+                abel class="form-label fw-semibold">
                   <i class="bi bi-chat-dots me-1 text-success"></i>
                   Sujet <span class="text-danger">*</span>
                 </label>
-                <select name="subject" class="form-select" required>
+                <select name="subject"
+                        class="form-select" required>
                   <option value="" disabled selected>
                     Choisir un sujet
                   </option>
@@ -280,7 +293,7 @@
 
               <!-- Message -->
               <div class="col-12">
-                <label class="form-label fw-semibold">
+                abel class="form-label fw-semibold">
                   <i class="bi bi-pencil me-1 text-success"></i>
                   Message <span class="text-danger">*</span>
                 </label>
@@ -291,16 +304,19 @@
                           required></textarea>
               </div>
 
-              <!-- Newsletter checkbox -->
+              <!-- Newsletter -->
               <div class="col-12">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox"
+                  <input class="form-check-input"
+                         type="checkbox"
                          name="subscribe_newsletter"
                          id="subscribeNewsletter"/>
-                         <label class="form-check-label text-muted small"
+                  abel class="form-check-label
+                                text-muted small"
                          for="subscribeNewsletter">
-                    Je souhaite recevoir la newsletter de SADAC
-                    (actualités, événements, nouveaux produits)
+                    Je souhaite recevoir la newsletter
+                    de SADAC (actualités, événements,
+                    nouveaux produits)
                   </label>
                 </div>
               </div>
@@ -308,8 +324,10 @@
               <!-- Bouton -->
               <div class="col-12">
                 <button type="submit"
-                        class="btn btn-sadac btn-lg px-5 w-100 w-md-auto">
-                  <i class="bi bi-send me-2"></i>Envoyer le message
+                        class="btn btn-sadac btn-lg
+                               px-5 w-100 w-md-auto">
+                  <i class="bi bi-send me-2"></i>
+                  Envoyer le message
                 </button>
               </div>
 
