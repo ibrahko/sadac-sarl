@@ -43,7 +43,10 @@ class AboutView(TemplateView):
 class ContactView(FormView):
     template_name = "core/contact.html"
     form_class    = ContactForm
-    success_url   = reverse_lazy("core:contact")
+
+    def get_success_url(self):
+        from django.urls import reverse
+        return reverse("core:contact")
 
     def _get_client_ip(self, request):
         x_forwarded = request.META.get(
@@ -68,14 +71,27 @@ class ContactView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        import threading
+
         ip        = self._get_client_ip(self.request)
         cache_key = f"contact_limit_{ip}"
         count     = cache.get(cache_key, 0)
         cache.set(cache_key, count + 1, timeout=3600)
 
+        # Sauvegarde synchrone (rapide)
         form.save()
-        form.send_email()
 
+        # Envoi email en arrière-plan
+        def send_async():
+            try:
+                form.send_email()
+            except Exception:
+                pass
+
+        t = threading.Thread(target=send_async, daemon=True)
+        t.start()
+
+        # Newsletter si cochée
         if self.request.POST.get("subscribe_newsletter"):
             email = form.cleaned_data.get("email")
             if email:
@@ -87,3 +103,4 @@ class ContactView(FormView):
             "Nous vous répondrons dans les plus brefs délais !"
         )
         return super().form_valid(form)
+
