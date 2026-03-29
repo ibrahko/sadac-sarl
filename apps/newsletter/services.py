@@ -1,4 +1,5 @@
-from django.core.mail import get_connection, EmailMessage
+import threading
+from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from .models import Subscriber, Newsletter
@@ -19,43 +20,34 @@ def send_newsletter(newsletter_id):
     if count == 0:
         return 0
 
-    # Marquer comme envoyée immédiatement
+    # Marquer envoyée AVANT le thread
     newsletter.status  = 'sent'
     newsletter.sent_at = timezone.now()
     newsletter.save()
 
-    emails = list(
+    # Copie des données pour le thread
+    subject    = newsletter.subject
+    body       = newsletter.body
+    from_email = settings.DEFAULT_FROM_EMAIL
+    emails     = list(
         subscribers.values_list('email', flat=True)
     )
 
-    try:
-        # Ouvrir une seule connexion SMTP
-        # et envoyer tous les emails d'un coup
-        connection = get_connection(
-            fail_silently=True,
-            timeout=30,
-        )
-        connection.open()
-
-        messages = []
+    def send_all():
         for email in emails:
-            msg = EmailMessage(
-                subject=newsletter.subject,
-                body=newsletter.body,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[email],
-                connection=connection,
-            )
-            messages.append(msg)
+            try:
+                send_mail(
+                    subject=subject,
+                    message=body,
+                    from_email=from_email,
+                    recipient_list=[email],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
 
-        if messages:
-            connection.send_messages(messages)
-
-        connection.close()
-
-    except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Newsletter send error: {e}")
+    # Thread non-daemon pour que Gunicorn ne le tue pas
+    t = threading.Thread(target=send_all, daemon=False)
+    t.start()
 
     return count

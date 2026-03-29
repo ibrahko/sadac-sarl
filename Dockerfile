@@ -70,7 +70,11 @@ EXPOSE ${PORT:-8000}
 CMD python manage.py migrate --no-input --settings=sadac.settings.prod && \
     gunicorn sadac.wsgi:application \
     --bind 0.0.0.0:${PORT:-8000} \
-    --workers 3 --timeout 120 \
-    --access-logfile - --error-logfile -
+    --workers 2 \
+    --threads 4 \
+    --timeout 120 \
+    --graceful-timeout 30 \
+    --access-logfile - \
+    --error-logfile -
 
 
