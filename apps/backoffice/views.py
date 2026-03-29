@@ -568,7 +568,7 @@ class SubscriberListView(StaffRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["total_active"] = Subscriber.objects.filter(
+        ctx["total_active"]   = Subscriber.objects.filter(
             is_active=True).count()
         ctx["total_inactive"] = Subscriber.objects.filter(
             is_active=False).count()
@@ -580,45 +580,66 @@ class SendNewsletterView(StaffRequiredMixin, View):
     template_name = "backoffice/newsletter/send.html"
 
     def get(self, request, *args, **kwargs):
-        newsletters = Newsletter.objects.order_by("-created_at")
-        subscribers_count = Subscriber.objects.filter(
-            is_active=True).count()
-        return render_to_response(
-            self.template_name,
-            {
-                "newsletters": newsletters,
-                "subscribers_count": subscribers_count,
-            },
-            request
+        newsletters       = Newsletter.objects.order_by(
+            "-created_at"
         )
+        subscribers_count = Subscriber.objects.filter(
+            is_active=True
+        ).count()
+        return render(request, self.template_name, {
+            "newsletters":       newsletters,
+            "subscribers_count": subscribers_count,
+        })
 
     def post(self, request, *args, **kwargs):
         action = request.POST.get("action")
 
         if action == "create":
-            subject = request.POST.get("subject")
-            body = request.POST.get("body")
+            subject = request.POST.get("subject", "").strip()
+            body    = request.POST.get("body", "").strip()
             if subject and body:
                 Newsletter.objects.create(
                     subject=subject,
                     body=body,
                     status="draft"
                 )
-                messages.success(request, "Newsletter créée en brouillon.")
+                messages.success(
+                    request,
+                    "Newsletter créée en brouillon."
+                )
             else:
                 messages.error(
-                    request, "Sujet et contenu obligatoires.")
+                    request,
+                    "Sujet et contenu obligatoires."
+                )
 
         elif action == "send":
             newsletter_id = request.POST.get("newsletter_id")
             if newsletter_id:
-                count = send_newsletter(int(newsletter_id))
-                messages.success(
-                    request,
-                    f"Newsletter envoyée à {count} abonné(s)."
-                )
+                try:
+                    count = send_newsletter(int(newsletter_id))
+                    if count > 0:
+                        messages.success(
+                            request,
+                            f"Newsletter en cours d'envoi "
+                            f"à {count} abonné(s)."
+                        )
+                    else:
+                        messages.warning(
+                            request,
+                            "Aucun abonné actif ou newsletter "
+                            "déjà envoyée."
+                        )
+                except Exception as e:
+                    messages.error(
+                        request,
+                        f"Erreur lors de l'envoi : {str(e)}"
+                    )
             else:
-                messages.error(request, "Aucune newsletter sélectionnée.")
+                messages.error(
+                    request,
+                    "Aucune newsletter sélectionnée."
+                )
 
         return redirect("backoffice:send_newsletter")
 
@@ -631,6 +652,7 @@ class NewsletterDeleteView(StaffRequiredMixin, DeleteView):
     def form_valid(self, form):
         messages.success(self.request, "Newsletter supprimée.")
         return super().form_valid(form)
+
 
 
 # ===================================================
