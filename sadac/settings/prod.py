@@ -48,10 +48,15 @@ STORAGES = {
     },
 }
 
-# Cache
+# Headers sécurité supplémentaires
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+PERMISSIONS_POLICY     = "geolocation=(), microphone=()"
+
+# Limite les requêtes via cache
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'TIMEOUT': 300,
     }
 }
 
@@ -86,3 +91,6 @@ DATABASES = {
         'PORT':     config('DB_PORT', default='5432'),
     }
 }
+
+
+
