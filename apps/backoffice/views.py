@@ -300,7 +300,7 @@ class GalleryListView(StaffRequiredMixin, ListView):
 
 class GalleryCreateView(StaffRequiredMixin, CreateView):
     model = Gallery
-    template_name = "backoffice/gallery/media_form.html"
+    template_name = "backoffice/gallery/form.html"
     fields = ["title", "event", "description"]
     success_url = reverse_lazy("backoffice:gallery_list")
 
