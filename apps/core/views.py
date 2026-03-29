@@ -2,7 +2,7 @@ from django.views.generic import TemplateView, FormView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.core.cache import cache
-from django.http import HttpResponseTooManyRequests
+from django.http import HttpResponse
 
 from .forms import ContactForm
 from .models import Partner
@@ -59,9 +59,10 @@ class ContactView(FormView):
             cache_key = f"contact_limit_{ip}"
             count     = cache.get(cache_key, 0)
             if count >= 3:
-                return HttpResponseTooManyRequests(
+                return HttpResponse(
                     "Trop de messages envoyés. "
                     "Veuillez réessayer dans une heure.",
+                    status=429,
                     content_type="text/plain"
                 )
         return super().dispatch(request, *args, **kwargs)
